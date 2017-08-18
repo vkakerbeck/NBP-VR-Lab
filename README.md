@@ -4,7 +4,7 @@ This Git project is designated to the purpose of sharing files and code related 
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. In order to get the project onto your machine open the cmd command line. Navigate to your chosen folder for this project (using cd path).
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. In order to get the project onto your machine install git hub (already installed on the VR1 computer) and open the cmd command line. Navigate to your chosen folder for this project (using cd path). Type *git clone https://github.com/vkakerbeck/NBP-VR-Lab.git*.
 
 ### Prerequisites
 
