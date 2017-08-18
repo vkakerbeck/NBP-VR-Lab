@@ -1,11 +1,10 @@
-# NBP-VR-Lab
-# Project Title
+# NBP-VR-Lab - Project Seahaven
 
-One Paragraph of project description goes here
+This Git project is designated to the purpose of sharing files and code related to the nbp VR lab. Please keep your functioning code updated here. Take care to comment and make the purpose and use of your code understandable to other people.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. In order to get the project onto your machine open the cmd command line. Navigate to your chosen folder for this project (using cd path).
 
 ### Prerequisites
 
