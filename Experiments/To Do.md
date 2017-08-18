@@ -1,12 +1,12 @@
-### Upload files
+### 1. Upload files
 - pointing task
 - absolute orientation
 - relative orientation
-### Fix Bugs
+### 2. Fix Bugs
 *make list of Bugs here*
 - [ ] xxx
 
 
-### Implement infinite time condition
+### 3. Implement infinite time condition
 
-### combine code into one executable program (GUI?)
+### 4. Combine code into one executable program (GUI?)
