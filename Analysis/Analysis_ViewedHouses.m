@@ -43,10 +43,10 @@ for ii = 1: Number
         end
     end
 end
-avg=total/Number;
-avgper = totalper/Number;
-avgTime = totaltime/Number;
-totalNum=sortrows(totalNum,2,'descend');
+avg=total/Number;%how many houses were looked at on average
+avgper = totalper/Number;%how much percent of the houses
+avgTime = totaltime/Number;%how long on average were houses looked at
+totalNum=sortrows(totalNum,2,'descend');%sort the table of houseViews in descending order (most often viewed houses on top)
 A=cell2table(NumHouses);
 A.Properties.RowNames={'NumHousesSeen' 'PercentHousesSeen' 'DurationLookedAtHouse'};
 clear ii; clear len; clear total; clear x; clear Number; clear totalper; clear percentage;clear ans;clear sumViews;clear h;clear totaltime;

@@ -1,7 +1,11 @@
 %PartList = {1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,18,19,20,21,22,24,25,26,28,29};
 PartList = {30,31};
 Number = length(PartList);
+avgdist = cell(1,Number);
 for ii = 1:Number
+    %read in data and save in variables. For the first PartList with
+    %subjects 1-29 comment in the lines with %% since they still have a
+    %time stamp in their raw files
     suj_num = cell2mat(PartList(ii));
     if suj_num < 10
         file = strcat('viewedHouses_VP',num2str(0),num2str(suj_num),'.txt');
@@ -41,10 +45,9 @@ for ii = 1:Number
             totaldist = totaldist+distance{a};count = count+1;
         end
     end
-    avgdist = totaldist/count;
-    %distvar = var(distance);
+    avgdist{ii} = totaldist/count; %average distance from which a houses were seen
     clear data;
-
+    %calculate how often one house was looked at:
     [uniqueX, ~, J]=unique(houses); %uniqueX = which elements exist in houses, J = to which of the elements in uniqueX does the element in houses correspond 
     occ = histc(J, 1:numel(uniqueX)); %histogram bincounts to count the # of occurances of each house
     NumViews = table(uniqueX',occ);
@@ -58,7 +61,6 @@ for ii = 1:Number
            housenumbers{a} = str2num(houses{a}(1:3));
        end
     end
-
     h = cell2mat(housenumbers);
     clear a;clear h;
 
@@ -97,7 +99,8 @@ for ii = 1:Number
     xlabel('Time (seconds/10)');
     grid on
     clear color; clear idx; clear labels; clear order; clear xlabels; clear ylabels; clear xpatches; clear ypatches;
-
+    %Calculate average distance fro which each house was looked at and
+    %variance in the distance:
     lenHouses = length(uniqueX);
     distances = cell(lenHouses,3);
     distances(1:lenHouses) = uniqueX;
@@ -112,12 +115,13 @@ for ii = 1:Number
         distances{a,3}=var(distances{a,2});
         distances{a,2}=mean(distances{a,2});
     end
+    %save everything in NumViews:
     NumViews = [NumViews distances];
     NumViews(:,[3])=[];
     remove = isnan(NumViews.Var4);%remove houses that we're 'seen' from further away than the far clip plane
     NumViews(remove,:)=[];
     clear uniqueX;clear occ;clear J;
-    
+    %Save NumViews as a matlab table:
     if suj_num < 10
         current_name = strcat('D:/v.kakerbeck/Tracking/VP_Data/Viewed Houses/','NumViewsD_','VP_',num2str(0),num2str(suj_num),'.mat');
     else
