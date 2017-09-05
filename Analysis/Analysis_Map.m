@@ -1,7 +1,6 @@
 %% Show overlaid maps
-%PartList={1,2,3,4,5,6,7,8,10,11}; %for Bachelors Thesis Data set
-PartList = {12,13,14,15,16,17,18,19,20,21,22,25,26,27,28}; %Subjects with new script
-Number = length(PartList);%11;
+PartList={13,14,15,16};
+Number = length(PartList);
 map = imread('map5.png'); 
 map = imresize(map,[500 450]);
 for ii = 1: Number
@@ -13,13 +12,13 @@ for ii = 1: Number
     end
     color = randi([0 255],1,3);
     len = size(x.path,2);
-    for a=1:len
+    for a=1:len-1
         map(int64(x.path(1,a)),int64(x.path(2,a)),1) = color(1);
         map(int64(x.path(1,a)),int64(x.path(2,a)),2) = color(2);
         map(int64(x.path(1,a)),int64(x.path(2,a)),3) = color(3);
     end
 end
-image(map)
+image(map)%save as jpg when displayed
 %% show single maps
 for ii = 1: Number
     e = cell2mat(PartList(ii));

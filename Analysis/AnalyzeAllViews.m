@@ -1,5 +1,5 @@
 %PartList = {1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,18,19,20,21,22,24,25,26,28,29};
-PartList = {30,31};
+PartList = {1,5,8,9,12,13,16};
 Number = length(PartList);
 avgdist = cell(1,Number);
 for ii = 1:Number
@@ -8,9 +8,9 @@ for ii = 1:Number
     %time stamp in their raw files
     suj_num = cell2mat(PartList(ii));
     if suj_num < 10
-        file = strcat('viewedHouses_VP',num2str(0),num2str(suj_num),'.txt');
+        file = strcat('ViewedHouses_VP',num2str(0),num2str(suj_num),'.txt');
     else
-        file = strcat('viewedHouses_VP',num2str(suj_num),'.txt');
+        file = strcat('ViewedHouses_VP',num2str(suj_num),'.txt');
     end 
     disp(file);
     data = fopen(file);
@@ -120,12 +120,13 @@ for ii = 1:Number
     NumViews(:,[3])=[];
     remove = isnan(NumViews.Var4);%remove houses that we're 'seen' from further away than the far clip plane
     NumViews(remove,:)=[];
+    NumViews.Properties.VariableNames{'Var1'}='House';NumViews.Properties.VariableNames{'Var4'}='DistanceMean';NumViews.Properties.VariableNames{'Var5'}='DistanceVariance';
     clear uniqueX;clear occ;clear J;
     %Save NumViews as a matlab table:
     if suj_num < 10
-        current_name = strcat('D:/v.kakerbeck/Tracking/VP_Data/Viewed Houses/','NumViewsD_','VP_',num2str(0),num2str(suj_num),'.mat');
+        current_name = strcat('D:/v.kakerbeck/Tracking/ViewedHouses/','NumViewsD_','VP_',num2str(0),num2str(suj_num),'.mat');
     else
-        current_name = strcat('D:/v.kakerbeck/Tracking/VP_Data/Viewed Houses/','NumViewsD_','VP_',num2str(suj_num),'.mat');
+        current_name = strcat('D:/v.kakerbeck/Tracking/ViewedHouses/','NumViewsD_','VP_',num2str(suj_num),'.mat');
     end 
     save(current_name,'NumViews')
 end
