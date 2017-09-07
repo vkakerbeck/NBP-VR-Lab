@@ -1,0 +1,50 @@
+The new Seahaven version includes automatic starting of the training session, automatic recording and automatic saving with the matching VP number. This makes the work flow a lot easier. After executing the Seahaven application everything can be operated by using keys on the key board (command list is in the drop box and this Evernote notebook). Another addition is validation of the eye tracking data. This will be done once before, once during and once after the session.* Shotcuts to pupil labs, the Seahaven application and the tracking folder can be found in the common folder of the VR Computer.
+
+Before the subject arrives:
+
+	* Plug in base stations
+	* pupil capture, MATLab and the questionnaire
+	* Run the Seahaven application which can be found in the folder Seahaven 2.0
+	* Check if the two video streams of the eyes pop up, if you can move and if the sound works. Then close the application again. Don't start the training phase.
+	* Look into the currentVP.txt file inside of the tracking folder. The number in it +1 should be your next VP's number.
+	* Run the MATLab script ('familiaritytest.m' and any other scripts you use) once and see if it works (abort with Ctrl+C)
+	* Open a document in which you can make notes during the session (I usually do this on my Laptop in One Note, it is very very helpful to have something like that!)
+
+The Session:
+
+	* Let the subject sign the declaration of consent
+	* give a short introduction into VR (How does it work? How can you look around? How can you walk? What do you have to watch out for? Any other questions.)
+	* Tell the subject that there is a risk of motion sickness, why this is and that it can always stop the session. Make sure the subject knows that he/she does not have to continue the session while facing motion sickness in order to get the money/VP hours. 
+	* 
+		* Maybe give the person some strategies to avoid motion sickness (no sudden movements, walk into direction that you look, stop when looking around, close eyes for a minutes when feeling a bit sick,...)
+
+	* Tell the subject to sit down on the rotatable chair/stand at seagway (position marked with duck tape on the ground). Adjust the headset on the head. Make sure it doesn't drag forward/pushes on the nose of the subject. Ask the subject if it is really comfortable bc it will get uncomfortable after 30 minutes. Check the cameras if the eyes are in their view (sometimes the headset is sitting too low, sometimes the cameras are too close or too far away from the eyes)
+	* Tell the subject how the calibration works (the will be black and white targets appearing. Focus on the middle black dot. Sometimes they are on the side of the field of view and a bit blurry, don't worry about it)
+	* Open the Seahaven application
+	* Start the calibration by pressing 'C', observe the videos if everything looks good. If not readjust the headset and do the calibration again
+	* Start the validation by pressing 'V'. The results of the validation will be saved in a file called validation2D.txt. If the average is above 2 degree readjust the headset/cameras and repeat calibration & validation.
+	* Give the subject one controller and the headphones
+	* let the subject practice on the island for as long as they feel they need to. Ask if the music is too loud or too quiet
+	* When the subject is ready tell the subject it will be in the city for 30 minutes, in the beginning it is morning, after the 30 minutes it around sunset. Tell it to ask questions at any time and that it can stop at any time. There is no specific task besides free exploration, there will only be a task afterwards. Ask if there are any questions.
+	* set a timer for 15 minutes and one for 30 minutes, then start the VR training by pressing 'T'
+	* after 15 minutes start the validation again by pressing 'V'. If the validation error is above 3 degree calibrate the eye tracker again by pressing 'C'.
+	* After the 30 minutes run the validation again.
+	* Then ask the subject to turn into the direction where they think that north is in the city. While the subject is looking into this direction end the game by pressing 'Q'.
+	* Take the controller and headset from the subject and seat it at the table
+	* Run the familiarity task, type in your subject number, press enter
+	* Give the subject the questionnaire to fill out (Called 'Questionnaire.docx')
+	* Give them any other task you have
+	* Give VP hours/Money
+
+After the Experiment:
+
+	* save the Questionnaire with _VP#
+	* Run SeahavenDrawPath scene. If you analyze the subject you just tested you can just press play. If not specify the subject data which you want to analyze by modifying the variable VPNum in the DrawViewingPath Script inspector.
+
+Analysis (for individual subject):
+
+	* Depending on what you want to analyze the analysis scripts are in the respective folder of the raw data. All the raw data is saved in sub folders of the folder called Tracking. Saving is done automatically and with the next following subject number to avoid accidental overwriting of data. In the Matlab scripts you either need to specify a list of subject numbers which you want to analyze (called PartList) or Matlab asks you for one subject number after you execute the script. all scripts are commented. Most scripts automatically save processed data blocks together with the subject number. Visualizations like plots or maps can be saved by clicking on the 'save' icon on the top left of the figure window. A collection of short cuts to all available scripts is in the folder 'Analysis'.
+
+
+
+*everything in italic is not definitely decided yet.
