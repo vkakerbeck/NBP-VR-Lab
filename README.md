@@ -1,6 +1,6 @@
-# NBP-VR-Lab - Project Seahaven
+﻿# NBP-VR-Lab - Project Seahaven
 
-This Git project is designated to the purpose of sharing files and code related to the nbp VR lab. Please keep your functioning code updated here. Take care to comment and make the purpose and use of your code understandable to other people.
+This Git project is designated to the purpose of sharing files and code related to the nbp VR lab. Please keep your code updated here. Take care to comment and make the purpose and use of your code understandable to other people.
 
 ## Getting Started
 
