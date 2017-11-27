@@ -1,5 +1,7 @@
-%PartList = {1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,18,19,20,21,22,24,25,26,28,29};
-PartList = {34};
+%----------------Analyze Raw ViewedHouses Files (1st Level)----------------
+PartList = {34};% {1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,18,19,20,21,22,24,25,26,28,29};
+savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/ViewedHouses/';
+%--------------------------------------------------------------------------
 Number = length(PartList);
 avgdist = cell(1,Number);
 for ii = 1:Number
@@ -9,7 +11,6 @@ for ii = 1:Number
     else
         file = strcat('ViewedHouses_VP',num2str(suj_num),'.txt');
     end 
-    disp(file);
     data = fopen(file);
     data = textscan(data,'%s','delimiter', '\n');
     data = data{1};
@@ -25,14 +26,13 @@ for ii = 1:Number
         distance(a) = str2num(cell2mat(line(2)));
         timestamps(a) = str2num(cell2mat(line(3)));
     end
-    avgdist = mean(distance);
+    avgdist{Number} = mean(distance);
     clear data;
     %calculate how often one house was looked at:
     [uniqueX, ~, J]=unique(cellstr(houses)); %uniqueX = which elements exist in houses, J = to which of the elements in uniqueX does the element in houses correspond 
     occ = histc(J, 1:numel(uniqueX)); %histogram bincounts to count the # of occurances of each house
     NumViews = table(uniqueX',occ);
-
-    %make timeline---------------------------------------------------------
+    %------------------------Make Timeline---------------------------------
     housenumbers = cell(1,len);
     for a = 1:len-1%convert data
        if houses{a}(1:2)=='NH'
@@ -59,7 +59,6 @@ for ii = 1:Number
     list{end+1,1}=houses{e-1};
     list{end,2}=[first,length(housenumbers)-1];
     clear e; clear first; clear last;
-    %%Create timeline
     %make sure the list is ordered in reverse chronological order (to help identify the last label of a row)
     [~, order] = sortrows(vertcat(list{:, 2}), [-1 2]);
     list = list(order, :);
@@ -76,8 +75,11 @@ for ii = 1:Number
     patch(xpatches, ypatches, reshape(color, 1, [], 3)); 
     %text(xlabels-(xlabels-1200), ylabels+0.5, labels, 'fontsize', 10); 
     text(xlabels+5, ylabels+0.5, labels, 'fontsize', 10);
-    xlabel('Time (seconds/30)');
+    xlabel('Time (Minutes)');
+    set(gca,'XTickLabel',{1 double(len/6/1980) len/6*2/1980 len/6*3/1980 len/6*4/1980 len/6*5/1980 len/1980},'XTick',[1 len/6 len/6*2 len/6*3 len/6*4 len/6*5 len]);%!!only for 30 Mintes Sessions!!
     grid on
+    VP = PartList(ii);
+    saveas(gcf,fullfile([savepath 'Results/'],['Timeline_VP' num2str(VP{1}) '.jpeg']));
     clear color; clear idx; clear labels; clear order; clear xlabels; clear ylabels; clear xpatches; clear ypatches;
     %----------------------------------------------------------------------
     %Calculate average distance from which each house was looked at and
@@ -96,7 +98,7 @@ for ii = 1:Number
         distances{a,3}=var(distances{a,2});
         distances{a,2}=mean(distances{a,2});
     end
-    %save everything in NumViews:------------------------------------------
+    %Save everything in NumViews:------------------------------------------
     NumViews = [NumViews distances];
     NumViews(:,[3])=[];
     remove = isnan(NumViews.Var4);%remove houses that we're 'seen' from further away than the far clip plane
@@ -105,9 +107,10 @@ for ii = 1:Number
     clear uniqueX;clear occ;clear J;
     %Save NumViews as a matlab table:
     if suj_num < 10
-        current_name = strcat('D:/v.kakerbeck/Tracking/ViewedHouses/','NumViewsD_','VP_',num2str(0),num2str(suj_num),'.mat');
+        current_name = strcat(savepath,'NumViewsD_','VP_',num2str(0),num2str(suj_num),'.mat');
     else
-        current_name = strcat('D:/v.kakerbeck/Tracking/ViewedHouses/','NumViewsD_','VP_',num2str(suj_num),'.mat');
+        current_name = strcat(savepath,'NumViewsD_','VP_',num2str(suj_num),'.mat');
     end 
     save(current_name,'NumViews')
 end
+clear all;

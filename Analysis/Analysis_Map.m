@@ -1,5 +1,7 @@
-%% Show overlaid maps
+%%Specify Variables
 PartList={13,14,15,16};
+savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Position/Results/';
+%% Show overlaid maps
 Number = length(PartList);
 map = imread('map5.png'); 
 map = imresize(map,[500 450]);
@@ -19,6 +21,7 @@ for ii = 1: Number
     end
 end
 image(map)%save as jpg when displayed
+imwrite(map,fullfile(savepath,'OverlaidMaps.jpeg'));
 %% show single maps
 for ii = 1: Number
     e = cell2mat(PartList(ii));
@@ -54,4 +57,5 @@ hold on;
 plot([0 x],[0,y])
 legendInfo{Number+1} = ['True North'];
 legend(legendInfo)
+saveas(gcf,fullfile(savepath,'IndividualNorth.jpeg'));
 clear all;

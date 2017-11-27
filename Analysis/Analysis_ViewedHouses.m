@@ -1,4 +1,7 @@
+%------------Overall Viewed Houses Analysis (2nd Level)--------------------
 PartList={27,30,31};%list of subjects that you want to analyze
+savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/ViewedHouses/Results/';
+%--------------------------------------------------------------------------
 Number = length(PartList);
 NumHouses = cell(2,Number);
 total = 0;
@@ -44,15 +47,19 @@ for n = 1:height(totalNum)
     avgocc(n) = totalNum.occ(n)/totalNum.numVP(n);
 end
 totalNum = [totalNum array2table(avgocc)];
-    
+%Statistics and Saving-----------------------------------------------------
 avg=total/Number;%how many houses were looked at on average
 avgper = totalper/Number;%how much percent of the houses
-avgTime = mean(avgocc);%how long on average were houses looked at
+avgTime = mean(avgocc);%how long on average were houses looked at (s)
 avgTotalTime = sum(avgocc)/60;%average overall time looked at houses in minutes
 totalNum=sortrows(totalNum,2,'descend');%sort the table of houseViews in descending order (most often viewed houses on top)
 ViewStats=cell2table(NumHouses);
 ViewStats.Properties.RowNames={'NumHousesSeen' 'PercentHousesSeen' 'AverageTimeLookedAtOneHouse (s)' 'TimeLookedAtHouses (min)'};
-save('C:/Users/Vivi/Dropbox/Project Seahaven/Tracking/ViewedHouses/totalNum.mat','totalNum');%list of houses looks at with overal duration, average distance etc
-save('C:/Users/Vivi/Dropbox/Project Seahaven/Tracking/ViewedHouses/ViewingStats.mat','ViewStats');%overall subject stats in a table (percentage, num houses looked at, avg duration)
+ViewStats.Properties.VariableNames = strcat('VP ',cellfun(@num2str,PartList, 'un',0));
+t = array2table([avg,avgper,avgTime,avgTotalTime].');%add overall stas to table
+ViewStats = [ViewStats t];
+ViewStats.Properties.VariableNames{'Var1'} = 'Overall';
+save([savepath 'totalNum' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.mat'],'totalNum');%list of houses looks at with overal duration, average distance etc
+save([savepath 'ViewingStats' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.mat'],'ViewStats');%overall subject stats in a table (percentage, num houses looked at, avg duration)
 clear ii; clear len; clear total; clear x; clear Number; clear totalper; clear percentage;clear ans;clear sumViews;clear h;clear totaltime;
-clear e;clear found;clear n;
+clear e;clear found;clear n;clear a;clear avgocc;clear NumHouses;clear PartList;clear savepath;clear t;

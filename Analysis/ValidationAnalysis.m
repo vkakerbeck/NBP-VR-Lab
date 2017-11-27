@@ -1,7 +1,7 @@
 %-------------------ValidationAnalysis for all Subjects--------------------
-PartList={21,27};%list of subjects that you want to analyze
-NumVals = {8,10};%Number of validations done for subject
-savepath = 'D:/v.kakerbeck/Tracking/Validation/Results/';%where to save results
+PartList={27};%list of subjects that you want to analyze
+NumVals = {10};%Number of validations done for subject
+savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Validation/Results/';%where to save results
 %--------------------------------------------------------------------------
 NumSj = length(PartList);
 validations = zeros(9,max(NumVals{:}),NumSj);

@@ -1,6 +1,9 @@
-%3D Heatmap fo eye gaze (x,y,distance)
-data = fopen('3DHeatmapRandomGaze_VP31.txt');
-%data = fopen('3DHeatmapRandom_VP01.txt');
+%-------------3D Heatmap fo eye gaze (x,y,distance)------------------------
+VPNum = '31';
+savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Heatmap3D/Results';
+Condition = 'RandomGaze';
+%--------------------------------------------------------------------------
+data = fopen(['3DHeatmap' Condition '_VP' VPNum '.txt']);
 data = textscan(data,'%s','delimiter', '\n');
 data = data{1};
 data = table2array(cell2table(data));
@@ -22,8 +25,6 @@ for i = 1:double(len)
     end
 end
 d = d(d~=200);y = y(y~=200);x = x(x~=200);
-t = array2table([x;y;d].');
-t.Propertie.VariableNames = {'x' 'y' 'd'};
 c=zeros(size(x));
 for i=1:length(x)
   j=1:length(x);
@@ -33,5 +34,9 @@ for i=1:length(x)
 end
 %remember to cut off first values when eye tracker isn't initialized yet
 %scatter3(d,x,y)
+t = array2table([x;y;d;c].');
+t.Properties.VariableNames = {'x' 'y' 'd' 'c'};
 scatter3(d,x,y,2,c)%then save the plot by hand
 xlabel('Close - Far'); ylabel('Left - Right'); zlabel('Up - Down');
+save(fullfile(savepath,['Heatmap3D' Condition '_' VPNum]),'t');
+saveas(gcf,fullfile(savepath,['Heatmap3D' Condition '_' VPNum '.jpeg']));
