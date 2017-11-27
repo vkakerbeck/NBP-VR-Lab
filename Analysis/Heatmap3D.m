@@ -1,5 +1,5 @@
 %3D Heatmap fo eye gaze (x,y,distance)
-data = fopen('3DHeatmap_VP01.txt');
+data = fopen('3DHeatmapRandomGaze_VP31.txt');
 %data = fopen('3DHeatmapRandom_VP01.txt');
 data = textscan(data,'%s','delimiter', '\n');
 data = data{1};
@@ -9,7 +9,7 @@ x = zeros(1,len);
 y = zeros(1,len);
 d = zeros(1,len);
 for i = 1:double(len)
-    if data{i}(2)~=string('-')
+    if data{i}(2)~=char('-')
         x(i) = str2num(data{i}(2:9));
         y(i) = str2num(data{i}(11:19));
         d(i) = log(str2num(data{i}(21:end-1)));
@@ -22,6 +22,8 @@ for i = 1:double(len)
     end
 end
 d = d(d~=200);y = y(y~=200);x = x(x~=200);
+t = array2table([x;y;d].');
+t.Propertie.VariableNames = {'x' 'y' 'd'};
 c=zeros(size(x));
 for i=1:length(x)
   j=1:length(x);

@@ -18,7 +18,13 @@ for a = 1:double(len)-1
     y(a) = str2num(cell2mat(line(3)))-535;
     r(a) = str2num(cell2mat(line(4)));
     path(1,a)=x(a);path(2,a)=y(a);
-    map(int16(x(a)),int16(y(a)),1) = 255;map(int16(x(a)),int16(y(a)),2) = 0;map(int16(x(a)),int16(y(a)),3) = 0; %draw red line
+end
+derivR = abs(diff(r)*100);
+for a = 1:double(len)-1
+    color = derivR(a);
+    map(int16(x(a)),int16(y(a)),1) = 0;
+    map(int16(x(a)),int16(y(a)),2) = color*3;
+    map(int16(x(a)),int16(y(a)),3) = color*10; %draw line colored by change in rotation (light blue = much change)
 end
 image(map)
 %% draw individual north
@@ -33,6 +39,28 @@ image(map);
 hold on;
 %line(xp, yp);
 north={xp,yp,angle}; %save x and y of line + rotation of player
+%% Map Colored By Change in Rotation
+eyeD = fopen(['D:\v.kakerbeck\Tracking\EyesOnScreen\EyesOnScreen_VP' suj_num '.txt']);
+eyeD = textscan(eyeD,'%s','delimiter', '\n');
+eyeD= eyeD{1};
+eyeD = table2array(cell2table(eyeD));
+ln = int64(length(eyeD));
+X = zeros(1,ln);
+for n = 1:double(ln)-1
+    X(n) = (str2double(eyeD{n}(2:9))-0.5);
+    if(X(n)>0.5||X(n)<-0.5||X(n)==-0.5)
+        X(n) = 0;
+    end
+end
+newr = r - X*90;
+derivR = abs(diff(newr)*100);
+for a = 1:double(len)-1
+    color = derivR(a);
+    map(int16(x(a)),int16(y(a)),1) = 0;
+    map(int16(x(a)),int16(y(a)),2) = color;
+    map(int16(x(a)),int16(y(a)),3) = color*10; %draw red line
+end
+image(map);
 %% Save
 suj_num = str2num(suj_num);
 if suj_num < 1 || suj_num > 50
