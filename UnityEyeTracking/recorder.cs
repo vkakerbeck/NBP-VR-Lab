@@ -67,7 +67,7 @@ public class recorder : MonoBehaviour
         if (isRec)
         {
             timestamp = SessionLength-tracker.Timeleft;//camculate time stamp for each frame = seconds since training was started
-            tempPos = (transform.position.x.ToString("F2") + ", " + transform.position.y.ToString("F2") + ", " + transform.position.z.ToString("F2") + ", " + Camera.transform.rotation.eulerAngles.y.ToString("F2") + ", " + timestamp.ToString("F2"));
+            tempPos = (transform.position.x.ToString("F2") + ", " + transform.position.y.ToString("F2") + ", " + transform.position.z.ToString("F2") + ", " + Camera.transform.rotation.eulerAngles.x.ToString("F2") + ", "+ Camera.transform.rotation.eulerAngles.y.ToString("F2") + ", " + Camera.transform.rotation.eulerAngles.z.ToString("F2") + ", " + timestamp.ToString("F2")+", "+tracker.GetPupilTimestamp().ToString());
             nums.Add(tempPos);//add position and rotation to list
         }
         if (Input.GetKeyDown(KeyCode.Q))//Save recordings

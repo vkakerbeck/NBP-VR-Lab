@@ -59,6 +59,12 @@ public class PupilCalibMarker : MonoBehaviour {
             cam.cullingMask = 1 << LayerMask.NameToLayer("UI");
             cal = true;
         }
+        //if (Input.GetKeyDown(KeyCode.O))//3-Point Calibration -> does not help (makes calibration worse since it throws away old points)
+        //{
+        //    PupilGazeTracker.Instance.StartCalibration(new Vector2[] {new Vector2(0.3f,0.5f), new Vector2(0.5f, 0.5f),new Vector2(0.7f,0.5f) },120);
+        //    cam.cullingMask = 1 << LayerMask.NameToLayer("UI");
+        //    cal = true;
+        //}
         if (Input.GetKeyDown(KeyCode.S))//stop validation or callibration
         {
             if (cal) { PupilGazeTracker.Instance.StopCalibration(); cal = false; }
@@ -83,6 +89,7 @@ public class PupilCalibMarker : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.V))//start 2D validation 
         {
+            
             PupilGazeTracker.Instance.StartValidation2D(new Vector2[] {new Vector2(0.5f, 0.5f),
             new Vector2(0.3f, 0.3f), new Vector2(0.3f, 0.5f), new Vector2(0.3f, 0.7f), new Vector2(0.5f, 0.7f),
             new Vector2(0.7f, 0.7f),new Vector2(0.7f, 0.5f),new Vector2(0.7f, 0.3f),new Vector2(0.5f, 0.3f)});//9 point validation, leaving out the far periphery

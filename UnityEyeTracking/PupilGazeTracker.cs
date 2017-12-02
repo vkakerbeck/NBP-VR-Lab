@@ -112,7 +112,7 @@ public class PupilGazeTracker : MonoBehaviour
     public bool val2Started = false;//2D Validation started?
     bool pointTaken;//Reference point recorded for validation?
     public bool paused = false;//Session paused?
-    //public bool Pupilrecording = false; //XX: Uncomment this if you want to record through Pupil Labs (fps independent of Unity) 
+    public bool Pupilrecording = false; //XX: Uncomment this if you want to record through Pupil Labs (fps independent of Unity) 
     public bool EyesOpen = true;//Eyes Open? -> If confidence of eye tracker >0.5
     public bool trainingStarted = false;//Session started? -> Puts Player to start position and starts all recordings
     bool _isDone = false;
@@ -126,6 +126,7 @@ public class PupilGazeTracker : MonoBehaviour
     int _currentFps = 0;
     DateTime _lastT;
     object _dataLock;
+    float LastCalibration=0;//time of last calibration -> for log of validation value
     //Variables for Validation------------------------------------------------------------------------------
     Vector2[] valPoints;//Points used for validation
     int i;//counter for validation
@@ -138,10 +139,12 @@ public class PupilGazeTracker : MonoBehaviour
     float LastValAvg = 0;
     float StartT;//Timing variables used for Validation
     float StartTV;
+    float avgx = 0; float avgy = 0;//average error in X and Y direction
     //Lists for Values -> Usually saved to file later on---------------------------------------------------
     List<string> Gazes = new List<string>();//list of 2D eye positions
     List<string> Boxposs = new List<string>();//list of 3D Box Positions
     List<float> angles = new List<float>();//degrees of difference between ground truth and eye tracking data for validation
+    List<Vector2> XYDists = new List<Vector2>();//List with horizontal and vertical error during validation
     List<double> confidences = new List<double>();//Used in Validation to wait until eye detected well
     List<Dictionary<string, object>> _calibrationData = new List<Dictionary<string, object>>();
 
@@ -452,6 +455,7 @@ public class PupilGazeTracker : MonoBehaviour
             OnCalibrationDone(this);
         _setStatus(EStatus.ProcessingGaze);
         rec.isRec = true;
+        LastCalibration = 30-(Timeleft / 60);
     }
     //Validation--------------------------------------------------------------------------------------------------------------
     public void StartValidation2D(Vector2[] validPoints)//start 2D validation with given validation points given in PupilCalibMarker
@@ -488,7 +492,10 @@ public class PupilGazeTracker : MonoBehaviour
                 Vector3 AV = (refgaze - player.transform.position).normalized;//normalized reference vector given by the eye tracker
                 float angleR = Mathf.Acos(Vector3.Dot(GT, AV));//calculate visual angle between ground truth vector and reference vector in radians
                 float angleD = angleR * (180.0f / (float)Math.PI);//convert radians into degree
+                float angleX = Marker.transform.position.x-refgaze.x;//Difference in X value (pixel)
+                float angleY = Marker.transform.position.y - refgaze.y;//Difference in Y value (pixel)
                 angles.Add(angleD);
+                XYDists.Add(new Vector2(angleX, angleY));
             }
             else { StartTV = StartTV + Time.deltaTime; StartT = StartT + Time.deltaTime; confidences.Add(_pupilData.confidence); }
         }
@@ -510,6 +517,12 @@ public class PupilGazeTracker : MonoBehaviour
             sum = sum + d;
             avg = sum / angles.Count;
         }
+        float sumx = 0; float sumy = 0;
+        foreach (Vector2 v in XYDists)
+        {
+            sumx = sumx + Mathf.Abs(v[0]);sumy = sumy + Mathf.Abs(v[1]);//calculate sum of absolute values of distance between target and eye position
+            avgx = sumx / XYDists.Count; avgy = sumy / XYDists.Count;
+        }
         numVal2 = numVal2 + 1;
         String pathVal2 = String.Format(@"D:\v.kakerbeck\Tracking\Validation\validation2D_" + VPNum.ToString() + "_" + numVal2.ToString() + ".txt");
         LastValAvg = avg;
@@ -521,7 +534,14 @@ public class PupilGazeTracker : MonoBehaviour
             }
             validation.WriteLine("Average 2D Validation:");
             validation.WriteLine(avg);
-            validation.WriteLine(Timeleft);
+            validation.WriteLine(30-(Timeleft/60));
+            validation.WriteLine(LastCalibration);
+            foreach (var value in XYDists)
+            {
+                validation.WriteLine(value);
+            }
+            validation.WriteLine(avgx);//average error in x direction 
+            validation.WriteLine(avgy);//average error in y direction
         }
         angles.Clear();
         avg = 0;
@@ -652,7 +672,8 @@ public class PupilGazeTracker : MonoBehaviour
             }
             validation.WriteLine("Average 3D Validation:");
             validation.WriteLine(avg);
-            validation.WriteLine(Timeleft);
+            validation.WriteLine(30 - (Timeleft / 60));
+            validation.WriteLine(LastCalibration);
         }
         angles.Clear();
         avg = 0;
@@ -736,13 +757,13 @@ public class PupilGazeTracker : MonoBehaviour
         string str = "Time Left: " + Timeleft/60 + "min.";
         str += "\nLeft Eye:" + LeftEyePos.ToString();
         str += "\nRight Eye:" + RightEyePos.ToString();
-        str += "\nValidation: " + LastValAvg.ToString();
+        str += "\nValidation: " + LastValAvg.ToString("f3");
+        str += "X: " + avgx.ToString("f2") + " Y: " + avgy.ToString("f2");
         GUI.TextArea(new Rect(0, 0, 200, 70), str);
         VPNumIn = GUI.TextField(new Rect(0, 70, 200, 20), VPNumIn, 25);
         if (GUI.Button(new Rect(0, 90, 200, 20), "Set VP Number"))
         {
             VPNum = VPNumIn;
-            print(VPNum);
         }
     }
     public void RepaintGUI()
@@ -762,12 +783,12 @@ public class PupilGazeTracker : MonoBehaviour
                     trainingStarted = true;
                     //XX: Comment in if you want to record through Pupil Capture----------------------------------
                     //Record with Pupil Labes -> Higher framerate but takes a lot of space so not used right now
-                    //if (!Pupilrecording)
-                    //{
-                    //    StartPupilServiceRecording(TrackingPath +"PupilRecording");//save recording in the Trackin folder
-                    //    Pupilrecording = true;
-                    //}-------------------------------------------------------------------------------------------
-                    rec.VPNum = VPNum;
+                    if (!Pupilrecording)
+                    {
+                        StartPupilServiceRecording(TrackingPath + "PupilRecording");//save recording in the Trackin folder
+                        Pupilrecording = true;
+                        }
+                        rec.VPNum = VPNum;
                     //start updateInterval loop -> start recording
                     InvokeRepeating("UpdateInterval", updateInterval, updateInterval);
                     //start updateInterval loop in recorder Script -> start recording
@@ -797,12 +818,12 @@ public class PupilGazeTracker : MonoBehaviour
         }
         CenterX = (leftEye.gaze.x + rightEye.gaze.x) * 0.5f;//add up normalized gaze positions and divide by 2 (-> cyclopian eye gaze normalized)
         CenterY = (leftEye.gaze.y + rightEye.gaze.y) * 0.5f;
-        //XX: Comment in if you want to record through Pupil Capture------------------------------------------------------------------
+        //XX: Comment in if you want to record through Pupil Capture and start/stop it manually by pressing R--------------------
         //if (Input.GetKeyDown(KeyCode.R))//Start and stop pupil data recording 
         //{
         //    if (!Pupilrecording)
         //    {
-        //        StartPupilServiceRecording(TrackingPath +"PupilRecording");//save recording in the Tracking folder
+        //        StartPupilServiceRecording(TrackingPath + "PupilRecording");//save recording in the Tracking folder
         //        Pupilrecording = true;
         //    }
         //    else

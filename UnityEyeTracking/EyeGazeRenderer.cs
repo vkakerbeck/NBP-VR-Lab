@@ -24,7 +24,7 @@ public class EyeGazeRenderer : MonoBehaviour
         _image.enabled = false;
     }
 	void Update() {
-        if (Input.GetKeyDown(KeyCode.C))//calibration
+        if (Input.GetKeyDown(KeyCode.C)|| Input.GetKeyDown(KeyCode.O))//calibration
             _image.enabled = true;//show marker
         if (Input.GetKeyDown(KeyCode.V))//validation
             _image.enabled = true;
