@@ -1,12 +1,14 @@
 %---------------Compare Gaze While Standing to Walking--------------------- 
-PartList = {27};%input('Enter subject number (1-50): ','s');
-sourcepath = 'C:\Users\Vivi\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
+PartList = {6876,3755};%List of subject numbers
+sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 %--------------------------------------------------------------------------
 Number = length(PartList);
 StandX = [];
 StandY = [];
 WalkX = [];
 WalkY = [];
+Xall = [];
+Yall = [];
 for ii = 1:Number
     suj_num = num2str(cell2mat(PartList(ii)));
     X = [];
@@ -17,12 +19,12 @@ for ii = 1:Number
     data = textscan(data,'%s','delimiter', '\n');
     data = data{1};
     data = table2array(cell2table(data));
-    pdata = fopen(strcat(sourcepath,'Position\positions_VP',num2str(suj_num),'.txt'));
+    pdata = fopen(strcat(sourcepath,'position\positions_VP',num2str(suj_num),'.txt'));
     pdata = textscan(pdata,'%s','delimiter', '\n');
     pdata = pdata{1};
     pdata = table2array(cell2table(pdata));
     plen = int64(length(pdata));
-    for p = 1:plen
+    for p = 1:plen-1
         if(str2double(data{p}(2:9))==0||str2double(data{p}(2:9))>1||str2double(data{p}(2:9))<0)
         else
             line = textscan(pdata{p},'%s','delimiter', ',');line = line{1};
@@ -43,16 +45,29 @@ for ii = 1:Number
            WalkY(end+1) = Y(i);
        end
     end
+    Xall = [Xall, X];
+    Yall = [Yall, Y];
 end
-scatter(StandX,StandY);hold;scatter(WalkX,WalkY);
-legend('Gaze while standing','Gaze while walking');
+%---------------General Heatmap--------------------------------------------
+all = hist3([Xall', Yall'],[100,100]);
+normalized = all/norm(all);
+pcolor(normalized);
+saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['Gaze2DHeatmap' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.jpeg']));
+%---------------Comparing Gaze Walking to Gaze Standing--------------------
+scatter(StandX,StandY);hold;
+scatter(WalkX,WalkY);
+[ns,cs] = hist3([StandX', StandY']);
+contour(cs{1},cs{2},ns,'-','LineWidth',2);
+[nw,cw] = hist3([WalkX', WalkY']);
+contour(cw{1},cw{2},nw,':','LineWidth',2);
+legend('Gaze while standing (line)','Gaze while walking (dotted)');
 title('Gaze During Walking and Standing');
 xlabel('X');ylabel('Y');
 saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['GazeWalkStand' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.jpeg']));
 VarianceStandX = var(StandX);VarianceStandY = var(StandY);
 VarianceWalkX = var(WalkX);VarianceWalkY = var(WalkY);
-[hx,px] = vartest2(StandX,WalkX,0.0001,'right')
-[hy,py] = vartest2(StandY,WalkY,0.0000001,'both')
+[hx,px] = vartest2(StandX,WalkX,0.0001,'right');
+[hy,py] = vartest2(StandY,WalkY,0.0000001,'both');
 variances = table([VarianceStandX;VarianceStandY], [VarianceWalkX;VarianceWalkY],[px;py]);
 variances.Properties.VariableNames = {'Standing','Walking','pValues'};
 variances.Properties.RowNames = {'X','Y'};

@@ -1,8 +1,8 @@
 %---------------Compare Gaze Before Left and Right Turns------------------- 
-PartList = {27,34};%input('Enter subject number (1-50): ','s');
-sourcepath = 'C:\Users\Vivi\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
+PartList = {6876,3755};%List of subject numbers
+sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 IntervalLength = 5;%Significant turn +_Interval Length = Interval of gazes counted for turn
-TurnSignificance = 10;%amount of rotation degree change for something to classified as turn
+TurnSignificance = 20;%amount of rotation degree change for something to classified as turn
 %--------------------------------------------------------------------------
 Number = length(PartList);
 rightpX = [];rightpY = [];
@@ -82,7 +82,9 @@ for ii = 1:Number
        end
     end
 end
-scatter(normpX,normpY);hold on;scatter(rightpX,rightpY);scatter(leftpX,leftpY);
+scatter(normpX,normpY);hold;scatter(rightpX,rightpY);scatter(leftpX,leftpY);
+[n,c] = hist3([normpX', normpY']);
+contour(c{1},c{2},n',12,'-','LineWidth',2);
 legend('Standard','Right Turn','Left Turn');
 title('Gaze During Left and Right Turns');
 xlabel('X');ylabel('Y');
@@ -94,11 +96,11 @@ plot(mean(normpX),mean(normpY),'k.','MarkerSize',35)
 plot(mean(normpX),mean(normpY),'b.','MarkerSize',30)
 saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['GazeLeftRight' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
 %ttest the three distributions (left, right, normal)-----------------------
-[hn pn] = ttest(normpX,0,'Alpha',0.01);
-[hl pl] = ttest(leftpX,0,'Alpha',0.01);
-[hr pr] = ttest(rightpX,0,'Alpha',0.01);
-ttests = table([hn;pn],[hl;pl],[hr;pr]);
-ttests.Properties.VariableNames = {'Normal','Left','Right'};
-ttest.Properties.RowNames = {'Hypothesis Rejected','P-Value'};
-save([sourcepath 'EyesOnScreen\Results\TTestLR' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.mat'],'ttests');
+% [hn pn] = ttest(normpX,0,'Alpha',0.01);
+% [hl pl] = ttest(leftpX,0,'Alpha',0.01);
+% [hr pr] = ttest(rightpX,0,'Alpha',0.01);
+% ttests = table([hn;pn],[hl;pl],[hr;pr]);
+% ttests.Properties.VariableNames = {'Normal','Left','Right'};
+% ttest.Properties.RowNames = {'Hypothesis Rejected','P-Value'};
+% save([sourcepath 'EyesOnScreen\Results\TTestLR' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.mat'],'ttests');
 %clear all;
