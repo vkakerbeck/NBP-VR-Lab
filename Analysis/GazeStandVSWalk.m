@@ -48,14 +48,36 @@ for ii = 1:Number
     Xall = [Xall, X];
     Yall = [Yall, Y];
 end
-%---------------General Heatmap--------------------------------------------
-all = hist3([Xall', Yall'],[100,100]);
-normalized = all/norm(all);
-pcolor(normalized);
-saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['Gaze2DHeatmap' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.jpeg']));
-%---------------Comparing Gaze Walking to Gaze Standing--------------------
-scatter(StandX,StandY);hold;
-scatter(WalkX,WalkY);
+if length(StandX)>length(WalkX)
+    limit = length(WalkX);
+else
+    limit = length(StandX);
+end   
+%% ---------------General Heatmap------------------------------------------
+size = 50;
+HMNorm = hist3([Xall', Yall'],[size,size]);
+HMNormN = HMNorm/norm(HMNorm);
+HMStand = hist3([StandX(1:limit)', StandY(1:limit)'],[size,size]);
+HMStandN = HMStand/norm(HMStand);
+HMWalk = hist3([WalkX(1:limit)', WalkY(1:limit)'],[size,size]);
+HMWalkN = HMWalk/norm(HMWalk);
+figure;
+subplot(2,2,1);hold;
+title('Gaze Overall');
+pcolor(HMNormN);colorbar;hold off;
+subplot(2,2,2);hold;
+title('Gaze Stand-Walk');
+pcolor(HMStandN-HMWalkN);colorbar;hold off;
+subplot(2,2,3);hold;
+title('Gaze During Standing');
+pcolor(HMStandN);colorbar;
+subplot(2,2,4);hold;
+title('Gaze During Walking');
+pcolor(HMWalkN);colorbar;
+saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['GazeWalkStandHeatmap' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.jpeg']));
+%% ---------------Comparing Gaze Walking to Gaze Standing------------------
+scatter(StandX(1:limit),StandY(1:limit));hold;
+scatter(WalkX(1:limit),WalkY(1:limit));colorbar;
 [ns,cs] = hist3([StandX', StandY']);
 contour(cs{1},cs{2},ns,'-','LineWidth',2);
 [nw,cw] = hist3([WalkX', WalkY']);

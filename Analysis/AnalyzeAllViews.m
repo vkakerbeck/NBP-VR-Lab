@@ -1,16 +1,12 @@
 %----------------Analyze Raw ViewedHouses Files (1st Level)----------------
-PartList = {34};% {1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,18,19,20,21,22,24,25,26,28,29};
+PartList = {3755,6876};% {1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,18,19,20,21,22,24,25,26,28,29};
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/ViewedHouses/';
 %--------------------------------------------------------------------------
 Number = length(PartList);
 avgdist = cell(1,Number);
 for ii = 1:Number
     suj_num = cell2mat(PartList(ii));
-    if suj_num < 10
-        file = strcat('ViewedHouses_VP',num2str(0),num2str(suj_num),'.txt');
-    else
-        file = strcat('ViewedHouses_VP',num2str(suj_num),'.txt');
-    end 
+    file = strcat('ViewedHouses_VP',num2str(suj_num),'.txt');
     data = fopen(file);
     data = textscan(data,'%s','delimiter', '\n');
     data = data{1};
@@ -30,7 +26,7 @@ for ii = 1:Number
     clear data;
     %calculate how often one house was looked at:
     [uniqueX, ~, J]=unique(cellstr(houses)); %uniqueX = which elements exist in houses, J = to which of the elements in uniqueX does the element in houses correspond 
-    occ = histc(J, 1:numel(uniqueX)); %histogram bincounts to count the # of occurances of each house
+    occ = histc(J, 1:numel(uniqueX))/30; %histogram bincounts to count the # of occurances of each house
     NumViews = table(uniqueX',occ);
     %------------------------Make Timeline---------------------------------
     housenumbers = cell(1,len);
@@ -104,13 +100,9 @@ for ii = 1:Number
     remove = isnan(NumViews.Var4);%remove houses that we're 'seen' from further away than the far clip plane
     NumViews(remove,:)=[];
     NumViews.Properties.VariableNames{'Var1'}='House';NumViews.Properties.VariableNames{'Var4'}='DistanceMean';NumViews.Properties.VariableNames{'Var5'}='DistanceVariance';
-    clear uniqueX;clear occ;clear J;
+    %clear uniqueX;clear occ;clear J;
     %Save NumViews as a matlab table:
-    if suj_num < 10
-        current_name = strcat(savepath,'NumViewsD_','VP_',num2str(0),num2str(suj_num),'.mat');
-    else
-        current_name = strcat(savepath,'NumViewsD_','VP_',num2str(suj_num),'.mat');
-    end 
+    current_name = strcat(savepath,'NumViewsD_','VP_',num2str(suj_num),'.mat');
     save(current_name,'NumViews')
 end
-clear all;
+%clear all;

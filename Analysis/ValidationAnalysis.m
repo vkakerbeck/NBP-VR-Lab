@@ -1,6 +1,6 @@
 %-------------------ValidationAnalysis for all Subjects--------------------
-PartList={27};%list of subjects that you want to analyze
-NumVals = {10};%Number of validations done for subject
+PartList={3755,6876};%list of subjects that you want to analyze
+NumVals = {10,11};%Number of validations done for subject
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Validation/Results/';%where to save results
 %--------------------------------------------------------------------------
 NumSj = length(PartList);
@@ -13,11 +13,7 @@ for ii = 1: NumSj
     SJXPoints = [];%for variance within subject
     SJXMeans = [];%for means of each validation
     for i = 1:NumVals{ii}
-        if e<10
-            file = fopen(['validation2D_0' num2str(e) '_' num2str(i) '.txt']);
-        else
-            file = fopen(['validation2D_' num2str(e) '_' num2str(i) '.txt']);
-        end
+        file = fopen(['validation2D_' num2str(e) '_' num2str(i) '.txt']);
         last = false;
         n = 0;
         while ~feof(file)%go through lines in file and save in arrays until end of file in reached
@@ -51,5 +47,5 @@ OverallStats = table(OverallMeanPoints,OverallMeanSubjects,OverallVariancePoints
 OverallStats.Properties.VariableNames = {'OverallMeanPoints';'OverallMeanSubjects';'OverallVariancePoints'};
 save([savepath 'ValidationStatsSJ.mat'],'Stats');
 save([savepath 'OverallStats.mat'],'OverallStats');
-clear e;clear file; clear i; clear ii; clear last; clear n;clear num; clear NumSj;clear NumVals;clear PartList; clear status;clear str;clear SujStats;
-clear SJXMeans;clear SJXPoints;clear SJMeans;
+%clear e;clear file; clear i; clear ii; clear last; clear n;clear num; clear NumSj;clear NumVals;clear PartList; clear status;clear str;clear SujStats;
+%clear SJXMeans;clear SJXPoints;clear SJMeans;

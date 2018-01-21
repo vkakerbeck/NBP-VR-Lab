@@ -1,5 +1,5 @@
 %--------------------------PositionAnalysis--------------------------------
-PartList = {27,34};%subjects you want to analyze
+PartList = {6876};%subjects you want to analyze
 sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 %--------------------------------------------------------------------------
 Number = length(PartList);
@@ -16,6 +16,7 @@ for ii = 1:Number
     else
         file = strcat('positions_VP',num2str(suj_num),'.txt');
     end
+    disp(file)
     data = fopen(file);
     data = textscan(data,'%s','delimiter', '\n');
     data = data{1};
@@ -54,8 +55,8 @@ for ii = 1:Number
     eyeD= eyeD{1};
     eyeD = table2array(cell2table(eyeD));
     ln = int64(length(eyeD));
-    X = zeros(1,ln);
-    for n = 1:double(ln)-1
+    X = zeros(1,ln+1);
+    for n = 1:double(ln)
         X(n) = (str2double(eyeD{n}(2:9))-0.5);
         if(X(n)>0.5||X(n)<-0.5||X(n)==-0.5)
             X(n) = 0;
@@ -71,30 +72,11 @@ for ii = 1:Number
     end
     image(mapC);
     %-----------------------------Save-------------------------------------
-    suj_num = suj_num;
-    if suj_num < 1 || suj_num > 50
-        error('subject number invalid');
-    end
-    if suj_num < 10
-        current_name = strcat(sourcepath,'Position/','Map_','VP_',num2str(0),num2str(suj_num),'.mat');
-    else
-        current_name = strcat(sourcepath,'Position/','Map_','VP_',num2str(suj_num),'.mat');
-    end 
+    current_name = strcat(sourcepath,'Position/','Map_','VP_',num2str(suj_num),'.mat');
     save(current_name,'map')
-    if suj_num < 1 || suj_num > 50
-        error('subject number invalid');
-    end
-    if suj_num < 10
-        current_name = strcat(sourcepath,'Position/','North_','VP_',num2str(0),num2str(suj_num),'.mat');
-    else
-        current_name = strcat(sourcepath,'Position/','North_','VP_',num2str(suj_num),'.mat');
-    end 
+    current_name = strcat(sourcepath,'Position/','North_','VP_',num2str(suj_num),'.mat');
     save(current_name,'north')
-    if suj_num < 10
-        current_name = strcat(sourcepath,'Position/','Path_','VP_',num2str(0),num2str(suj_num),'.mat');
-    else
-        current_name = strcat(sourcepath,'Position/','Path_','VP_',num2str(suj_num),'.mat');
-    end 
+    current_name = strcat(sourcepath,'Position/','Path_','VP_',num2str(suj_num),'.mat');
     save(current_name,'path')
 end
 clear all;

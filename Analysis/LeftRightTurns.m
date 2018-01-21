@@ -1,7 +1,7 @@
 %---------------Compare Gaze Before Left and Right Turns------------------- 
 PartList = {6876,3755};%List of subject numbers
 sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
-IntervalLength = 5;%Significant turn +_Interval Length = Interval of gazes counted for turn
+IntervalLength = 20;%Significant turn +_Interval Length = Interval of gazes counted for turn
 TurnSignificance = 20;%amount of rotation degree change for something to classified as turn
 %--------------------------------------------------------------------------
 Number = length(PartList);
@@ -84,7 +84,7 @@ for ii = 1:Number
 end
 scatter(normpX,normpY);hold;scatter(rightpX,rightpY);scatter(leftpX,leftpY);
 [n,c] = hist3([normpX', normpY']);
-contour(c{1},c{2},n',12,'-','LineWidth',2);
+contour(c{1},c{2},n',12,'-','LineWidth',2);colorbar;
 legend('Standard','Right Turn','Left Turn');
 title('Gaze During Left and Right Turns');
 xlabel('X');ylabel('Y');
@@ -95,6 +95,25 @@ plot(mean(leftpX),mean(leftpY),'y.','MarkerSize',30)
 plot(mean(normpX),mean(normpY),'k.','MarkerSize',35)
 plot(mean(normpX),mean(normpY),'b.','MarkerSize',30)
 saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['GazeLeftRight' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
+%% Make Heatmaps-----------------------------------------------------------
+size = 50;
+HMNorm = hist3([normpX', normpY'],[size,size]);
+HMNormN = HMNorm/norm(HMNorm);
+HMRight = hist3([rightpX', rightpY'],[size,size]);
+HMRightN = HMRight/norm(HMRight);
+HMLeft = hist3([leftpX', leftpY'],[size,size]);
+HMLeftN = HMLeft/norm(HMLeft);
+figure;
+subplot(2,2,1:2);hold;
+title('Gaze During No Turn');
+pcolor(HMNormN);colorbar;hold off;
+subplot(2,2,3);hold;
+title('Gaze During Right Turn');
+pcolor(HMRightN);colorbar;
+subplot(2,2,4);hold;
+title('Gaze During Left Turn');
+pcolor(HMLeftN);colorbar;
+saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['HeatMapLeftRight' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
 %ttest the three distributions (left, right, normal)-----------------------
 % [hn pn] = ttest(normpX,0,'Alpha',0.01);
 % [hl pl] = ttest(leftpX,0,'Alpha',0.01);

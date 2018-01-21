@@ -1,5 +1,5 @@
 %------------Overall Viewed Houses Analysis (2nd Level)--------------------
-PartList={27,30,31};%list of subjects that you want to analyze
+PartList={3755,6876};%list of subjects that you want to analyze
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/ViewedHouses/Results/';
 %--------------------------------------------------------------------------
 Number = length(PartList);
