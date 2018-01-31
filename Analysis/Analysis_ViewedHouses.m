@@ -8,11 +8,7 @@ total = 0;
 totalper = 0;
 for ii = 1: Number
     e = cell2mat(PartList(ii));
-    if e<10
-        x = load(['NumViewsD_VP_0' num2str(e) '.mat']);
-    else
-        x = load(['NumViewsD_VP_' num2str(e) '.mat']);
-    end
+    x = load(['NumViewsD_VP_' num2str(e) '.mat']);
     len = (size(x.NumViews,1));
     total=total+len;
     percentage = len/214;
