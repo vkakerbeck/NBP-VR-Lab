@@ -1,4 +1,4 @@
-%--Analyze Task Performance and Generate Output for Further Analysis-------
+%--Analyze Task Performance Overall and in Relation to Viewed Houses-------
 PartList ={3755,6876}; %all Subjects
 Number = length(PartList);
 %--------------------------------------------------------------------------

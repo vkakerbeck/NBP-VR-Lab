@@ -1,5 +1,5 @@
 %---------------Compare Gaze While Standing to Walking--------------------- 
-PartList = {6876,3755};%List of subject numbers
+PartList = {3755,6876};%List of subject numbers
 sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 %--------------------------------------------------------------------------
 Number = length(PartList);
@@ -9,8 +9,11 @@ WalkX = [];
 WalkY = [];
 Xall = [];
 Yall = [];
+StandWalk = cell(2,Number);
 for ii = 1:Number
     suj_num = num2str(cell2mat(PartList(ii)));
+    startS = length(StandX);
+    startW = length(WalkX);
     X = [];
     Y = [];
     Xp = [];
@@ -45,9 +48,15 @@ for ii = 1:Number
            WalkY(end+1) = Y(i);
        end
     end
+    standing = length(StandX);
+    walking = length(WalkX);
+    StandWalk(1,ii)=num2cell(standing-startS);StandWalk(2,ii)=num2cell(walking-startW);
     Xall = [Xall, X];
     Yall = [Yall, Y];
 end
+StandWalk=cell2table(StandWalk);
+StandWalk.Properties.RowNames={'Standing','Walking'};
+save([sourcepath '\EyesOnScreen\StandWalk' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) '.mat'],'StandWalk')
 if length(StandX)>length(WalkX)
     limit = length(WalkX);
 else
