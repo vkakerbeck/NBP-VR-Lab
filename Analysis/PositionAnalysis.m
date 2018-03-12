@@ -1,5 +1,5 @@
 %--------------------------PositionAnalysis--------------------------------
-PartList = {6876};%subjects you want to analyze
+PartList = {2907};%subjects you want to analyze
 sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 %--------------------------------------------------------------------------
 Number = length(PartList);
