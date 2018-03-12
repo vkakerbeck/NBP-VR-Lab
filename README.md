@@ -2,13 +2,18 @@
 
 This Git project is designated to the purpose of sharing files and code related to the nbp VR lab. Please keep your code updated here. Take care to comment and make the purpose and use of your code understandable to other people.
 
+## Short Demo
+https://www.youtube.com/watch?v=F2rqn8bdE7A&t=6s
+
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. In order to get the project onto your machine install git hub (already installed on the VR1 computer) and open the cmd command line. Navigate to your chosen folder for this project (using cd path). Type *git clone https://github.com/vkakerbeck/NBP-VR-Lab.git* to load the project into this folder. After that you can add your files and work on already existing files. Add changes with the *git add .* command and commit them with *git commit -m "info about your changes"*. In the end push all changes with *git push*.
 
 ### Prerequisites
-*install git hub
-*make git hub account
+* Matlab2014 or higher
+* Unity 2017
+* Pupil Labs Eye Tracker + Software
 
 ### Other programs you should have
 * MATLAB + PsychToolbox
