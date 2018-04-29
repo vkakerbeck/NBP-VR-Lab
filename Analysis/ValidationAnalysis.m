@@ -1,51 +1,85 @@
 %-------------------ValidationAnalysis for all Subjects--------------------
-PartList={3755,6876};%list of subjects that you want to analyze
-NumVals = {10,11};%Number of validations done for subject
+files = dir('validation2D_*.txt');
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Validation/Results/';%where to save results
 %--------------------------------------------------------------------------
-NumSj = length(PartList);
-validations = zeros(9,max(NumVals{:}),NumSj);
-SujStats = cell(3, NumSj);%Summary of individual subject statistics
-SJPoints = [];%for variance and mean over all validation points
-SJMeans = [];%for overall subject means
-for ii = 1: NumSj
-    e = cell2mat(PartList(ii));
-    SJXPoints = [];%for variance within subject
-    SJXMeans = [];%for means of each validation
-    for i = 1:NumVals{ii}
-        file = fopen(['validation2D_' num2str(e) '_' num2str(i) '.txt']);
-        last = false;
-        n = 0;
-        while ~feof(file)%go through lines in file and save in arrays until end of file in reached
+NumVal = length(files);
+for vi=1:NumVal
+    file = fopen(files(vi).name);
+    n = 0;
+    subjectNum = ['Subject' files(vi).name(14:17)];
+    valNum = ['Val' files(vi).name(19:end-4)];
+    lines = [];
+    while ~feof(file)%go through lines in file and save in arrays until end of file in reached
             n = n+1;
             str = fgetl(file);
-            [num, status] = str2num(str);
-            if status && ~last
-                validations(n,i,ii) = num;
-                SJPoints = [SJPoints num];
-                SJXPoints = [SJXPoints num];
-            else 
-                last = true;
-            end
-            if last
-                SJXMeans = [SJXMeans num];
+            lines = [lines str2num(str)];
+    end
+    fclose(file);
+    try
+        if length(lines)==14
+            validations.(subjectNum).(valNum).FullVal = true;
+            validations.(subjectNum).(valNum).AvgError = lines(10);
+            validations.(subjectNum).(valNum).XError = lines(13);
+            validations.(subjectNum).(valNum).YError = lines(14);
+            validations.(subjectNum).(valNum).Time = lines(11);
+            validations.(subjectNum).(valNum).LastCal = lines(12);
+        else
+            validations.(subjectNum).(valNum).FullVal = false;
+            validations.(subjectNum).(valNum).AvgError = lines(2);
+            validations.(subjectNum).(valNum).XError = lines(5);
+            validations.(subjectNum).(valNum).YError = lines(6);
+            validations.(subjectNum).(valNum).Time = lines(3);
+            validations.(subjectNum).(valNum).LastCal = lines(4);
+        end
+    catch
+        disp(valNum);
+        disp(subjectNum);
+    end
+end
+%% Now we have a struct with all important information and analyze this struct in the next step
+fields = fieldnames(validations);
+AcceptedErrors = [];
+ErrorAfterVal = [];
+ErrorAfterValInGame = [];
+Error1PointVal = [];
+XError = [];
+YError = [];
+X1P = [];
+Y1P = [];
+for i =1:numel(fields)
+    vals = fieldnames(validations.(fields{i}));
+    vals=sort_nat(vals);
+    for ii=1:numel(vals)
+        err = validations.(fields{i}).(vals{ii}).AvgError;
+        if ii<numel(vals) && i<numel(fields)
+            if validations.(fields{i}).(vals{ii}).Time ==0 && validations.(fields{i}).(vals{ii+1}).Time >0
+                AcceptedErrors = [AcceptedErrors err];
+                XError = [XError validations.(fields{i}).(vals{ii}).XError];
+                YError = [YError validations.(fields{i}).(vals{ii}).YError];
             end
         end
+        if validations.(fields{i}).(vals{ii}).Time-validations.(fields{i}).(vals{ii}).LastCal <1%less than 1 minute between validation and the last calibration
+            ErrorAfterVal = [ErrorAfterVal err];
+            if validations.(fields{i}).(vals{ii}).Time > 0
+                ErrorAfterValInGame = [ErrorAfterValInGame err];
+            end
+        end
+        if validations.(fields{i}).(vals{ii}).FullVal == false
+            Error1PointVal = [Error1PointVal err];
+            X1P = [X1P validations.(fields{i}).(vals{ii}).XError];
+            Y1P = [Y1P validations.(fields{i}).(vals{ii}).YError];
+        end
+        
     end
-    SJMeans = [SJMeans mean(SJXMeans)];
-    SujStats{1,ii} = PartList{ii};%Subject Number
-    SujStats{2,ii} = mean(SJXPoints);%mean over all points of Subject X
-    SujStats{3,ii} = mean(SJXMeans);%mean over all average validation scores of Subject X
-    SujStats{4,ii} = var(SJXPoints);%variance in all validation points
 end
-OverallMeanPoints = mean(SJPoints);
-OverallMeanSubjects = mean(SJMeans);
-OverallVariancePoints = var(SJPoints);
-Stats=cell2table(SujStats);
-Stats.Properties.RowNames={'Subject Number' 'Average of Subject Means' 'Average of all Data Points' 'Variance in Data Points'};
-OverallStats = table(OverallMeanPoints,OverallMeanSubjects,OverallVariancePoints);
-OverallStats.Properties.VariableNames = {'OverallMeanPoints';'OverallMeanSubjects';'OverallVariancePoints'};
-save([savepath 'ValidationStatsSJ.mat'],'Stats');
-save([savepath 'OverallStats.mat'],'OverallStats');
-%clear e;clear file; clear i; clear ii; clear last; clear n;clear num; clear NumSj;clear NumVals;clear PartList; clear status;clear str;clear SujStats;
-%clear SJXMeans;clear SJXPoints;clear SJMeans;
+%% Return Results
+disp(['Average Error for the last callibration before session starts:     ' num2str(mean(AcceptedErrors)), ' Median: ',num2str(median(AcceptedErrors))]);
+disp(['Average X-Error for the last callibration before session starts:   ' num2str(mean(XError)), ' Median: ',num2str(median(XError))]);
+disp(['Average Y-Error for the last callibration before session starts:   ' num2str(mean(YError)), ' Median: ',num2str(median(YError))]);
+disp(['Average Error directly after a callibration:                       ' num2str(mean(ErrorAfterVal)), ' Median: ',num2str(median(ErrorAfterVal))]);
+disp(['Average Error directly after a callibration during session:        ' num2str(mean(ErrorAfterValInGame)), ' Median: ',num2str(median(ErrorAfterValInGame))]);
+disp(['Average Error in one point callibration:                           ' num2str(mean(Error1PointVal)), ' Median: ',num2str(median(Error1PointVal))]);
+disp(['Average X-Error in one point callibration:                         ' num2str(mean(X1P)), ' Median: ',num2str(median(X1P))]);
+disp(['Average Y-Error in one point callibration:                         ' num2str(mean(Y1P)), ' Median: ',num2str(median(Y1P))]);
+clearvars -except validations
+
