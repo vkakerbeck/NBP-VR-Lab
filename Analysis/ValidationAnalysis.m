@@ -42,20 +42,31 @@ AcceptedErrors = [];
 ErrorAfterVal = [];
 ErrorAfterValInGame = [];
 Error1PointVal = [];
+ErrorValGameAccept = [];
+ErrorAtEnd = [];
 XError = [];
 YError = [];
 X1P = [];
 Y1P = [];
-for i =1:numel(fields)
+lastVnum = 0;
+for i =1:numel(fields)%go through all subjects
     vals = fieldnames(validations.(fields{i}));
     vals=sort_nat(vals);
-    for ii=1:numel(vals)
+    for ii=1:numel(vals)%go through al validations
         err = validations.(fields{i}).(vals{ii}).AvgError;
-        if ii<numel(vals) && i<numel(fields)
-            if validations.(fields{i}).(vals{ii}).Time ==0 && validations.(fields{i}).(vals{ii+1}).Time >0
-                AcceptedErrors = [AcceptedErrors err];
-                XError = [XError validations.(fields{i}).(vals{ii}).XError];
-                YError = [YError validations.(fields{i}).(vals{ii}).YError];
+        if ii<numel(vals)
+            if validations.(fields{i}).(vals{ii}).Time ==0 && validations.(fields{i}).(vals{ii+1}).Time >0%check if last validation before game (time=0, time+1 >0)
+                if lastVnum == i%Take care of some strange cases where session was started twice?
+                    %disp(i)
+                    AcceptedErrors(end) = err;
+                    XError(end) = validations.(fields{i}).(vals{ii}).XError;
+                    YError(end) = validations.(fields{i}).(vals{ii}).YError;       
+                else
+                    AcceptedErrors = [AcceptedErrors err];
+                    XError = [XError validations.(fields{i}).(vals{ii}).XError];
+                    YError = [YError validations.(fields{i}).(vals{ii}).YError];
+                    lastVnum = i;
+                end
             end
         end
         if validations.(fields{i}).(vals{ii}).Time-validations.(fields{i}).(vals{ii}).LastCal <1%less than 1 minute between validation and the last calibration
@@ -69,7 +80,15 @@ for i =1:numel(fields)
             X1P = [X1P validations.(fields{i}).(vals{ii}).XError];
             Y1P = [Y1P validations.(fields{i}).(vals{ii}).YError];
         end
-        
+        if validations.(fields{i}).(vals{ii}).Time > 0%check if in Game
+            if ii<numel(vals)%its not the last validation file
+                if validations.(fields{i}).(vals{ii+1}).Time-validations.(fields{i}).(vals{ii+1}).LastCal >1
+                    ErrorValGameAccept = [ErrorValGameAccept err];
+                end
+            else
+                ErrorAtEnd = [ErrorAtEnd err];
+            end
+        end
     end
 end
 %% Return Results
@@ -81,5 +100,7 @@ disp(['Average Error directly after a callibration during session:        ' num2
 disp(['Average Error in one point callibration:                           ' num2str(mean(Error1PointVal)), ' Median: ',num2str(median(Error1PointVal))]);
 disp(['Average X-Error in one point callibration:                         ' num2str(mean(X1P)), ' Median: ',num2str(median(X1P))]);
 disp(['Average Y-Error in one point callibration:                         ' num2str(mean(Y1P)), ' Median: ',num2str(median(Y1P))]);
+disp(['Average accepted error during Game:                                ' num2str(mean(ErrorValGameAccept)), ' Median: ',num2str(median(ErrorValGameAccept))]);
+disp(['Average error at end of game:                                      ' num2str(mean(ErrorAtEnd)), ' Median: ',num2str(median(ErrorAtEnd))]);
 clearvars -except validations
 
