@@ -9,9 +9,19 @@ for vi=1:NumVal
     subjectNum = ['Subject' files(vi).name(14:17)];
     valNum = ['Val' files(vi).name(19:end-4)];
     lines = [];
+    Xcoords = [];
+    Ycoords = [];
     while ~feof(file)%go through lines in file and save in arrays until end of file in reached
             n = n+1;
             str = fgetl(file);
+            if str(1)=='('
+                %disp(strsplit(str,','));
+                coords = strsplit(str,',');
+                cX = char(coords(1));
+                cY = char(coords(2));
+                Xcoords = [Xcoords abs(str2num(cX(2:end)))];
+                Ycoords = [Ycoords abs(str2num(cY(1:end-1)))];
+            end
             lines = [lines str2num(str)];
     end
     fclose(file);
@@ -19,15 +29,15 @@ for vi=1:NumVal
         if length(lines)==14
             validations.(subjectNum).(valNum).FullVal = true;
             validations.(subjectNum).(valNum).AvgError = lines(10);
-            validations.(subjectNum).(valNum).XError = lines(13);
-            validations.(subjectNum).(valNum).YError = lines(14);
+            validations.(subjectNum).(valNum).XError = mean(Xcoords);%lines(13);
+            validations.(subjectNum).(valNum).YError = mean(Ycoords);%lines(14);
             validations.(subjectNum).(valNum).Time = lines(11);
             validations.(subjectNum).(valNum).LastCal = lines(12);
         else
             validations.(subjectNum).(valNum).FullVal = false;
             validations.(subjectNum).(valNum).AvgError = lines(2);
-            validations.(subjectNum).(valNum).XError = lines(5);
-            validations.(subjectNum).(valNum).YError = lines(6);
+            validations.(subjectNum).(valNum).XError = abs(lines(5));
+            validations.(subjectNum).(valNum).YError = abs(lines(6));
             validations.(subjectNum).(valNum).Time = lines(3);
             validations.(subjectNum).(valNum).LastCal = lines(4);
         end
@@ -92,15 +102,15 @@ for i =1:numel(fields)%go through all subjects
     end
 end
 %% Return Results
-disp(['Average Error for the last callibration before session starts:     ' num2str(mean(AcceptedErrors)), ' Median: ',num2str(median(AcceptedErrors))]);
-disp(['Average X-Error for the last callibration before session starts:   ' num2str(mean(XError)), ' Median: ',num2str(median(XError))]);
-disp(['Average Y-Error for the last callibration before session starts:   ' num2str(mean(YError)), ' Median: ',num2str(median(YError))]);
-disp(['Average Error directly after a callibration:                       ' num2str(mean(ErrorAfterVal)), ' Median: ',num2str(median(ErrorAfterVal))]);
-disp(['Average Error directly after a callibration during session:        ' num2str(mean(ErrorAfterValInGame)), ' Median: ',num2str(median(ErrorAfterValInGame))]);
-disp(['Average Error in one point callibration:                           ' num2str(mean(Error1PointVal)), ' Median: ',num2str(median(Error1PointVal))]);
-disp(['Average X-Error in one point callibration:                         ' num2str(mean(X1P)), ' Median: ',num2str(median(X1P))]);
-disp(['Average Y-Error in one point callibration:                         ' num2str(mean(Y1P)), ' Median: ',num2str(median(Y1P))]);
-disp(['Average accepted error during Game:                                ' num2str(mean(ErrorValGameAccept)), ' Median: ',num2str(median(ErrorValGameAccept))]);
-disp(['Average error at end of game:                                      ' num2str(mean(ErrorAtEnd)), ' Median: ',num2str(median(ErrorAtEnd))]);
+disp(['Average Error (degree) for the last callibration before session starts:     ' num2str(mean(AcceptedErrors)), ' Median: ',num2str(median(AcceptedErrors))]);
+disp(['Average X-Error (pixel) for the last callibration before session starts:   ' num2str(mean(XError)), ' Median: ',num2str(median(XError))]);
+disp(['Average Y-Error (pixel) for the last callibration before session starts:   ' num2str(mean(YError)), ' Median: ',num2str(median(YError))]);
+disp(['Average Error (degree) directly after a callibration:                       ' num2str(mean(ErrorAfterVal)), ' Median: ',num2str(median(ErrorAfterVal))]);
+disp(['Average Error (degree) directly after a callibration during session:        ' num2str(mean(ErrorAfterValInGame)), ' Median: ',num2str(median(ErrorAfterValInGame))]);
+disp(['Average Error (degree) in one point callibration:                           ' num2str(mean(Error1PointVal)), ' Median: ',num2str(median(Error1PointVal))]);
+disp(['Average X-Error (pixel) in one point callibration:                         ' num2str(mean(X1P)), ' Median: ',num2str(median(X1P))]);
+disp(['Average Y-Error (pixel) in one point callibration:                         ' num2str(mean(Y1P)), ' Median: ',num2str(median(Y1P))]);
+disp(['Average accepted error (degree) during Game:                                ' num2str(mean(ErrorValGameAccept)), ' Median: ',num2str(median(ErrorValGameAccept))]);
+disp(['Average error (degree) at end of game:                                      ' num2str(mean(ErrorAtEnd)), ' Median: ',num2str(median(ErrorAtEnd))]);
 clearvars -except validations
 
