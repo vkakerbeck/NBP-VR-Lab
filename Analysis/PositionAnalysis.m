@@ -35,7 +35,7 @@ for ii = 1:Number
         line = textscan(data{a},'%s','delimiter', ',');line = line{1};
         x(a) = str2num(cell2mat(line(1)))-180;
         y(a) = str2num(cell2mat(line(3)))-535;
-        r(a) = str2num(cell2mat(line(4)));
+        r(a) = str2num(cell2mat(line(5)));
         path(1,a)=x(a);path(2,a)=y(a);
     end
     derivR = abs(diff(r)*100);
