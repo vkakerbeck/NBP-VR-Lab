@@ -1,7 +1,7 @@
 %-------------------ValidationAnalysis for all Subjects--------------------
-files = dir('validation2D_*.txt');
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Validation/Results/';%where to save results
 %--------------------------------------------------------------------------
+files = dir('validation2D_*.txt');
 NumVal = length(files);
 for vi=1:NumVal
     file = fopen(files(vi).name);

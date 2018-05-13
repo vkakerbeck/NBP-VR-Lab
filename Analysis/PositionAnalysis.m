@@ -1,8 +1,7 @@
 %--------------------------PositionAnalysis--------------------------------
-%PartList = {2907};%subjects you want to analyze
-files = dir('positions_VP*.txt');%Analyzes all subjectfiles in your positions directory
 sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 %--------------------------------------------------------------------------
+files = dir('positions_VP*.txt');%Analyzes all subjectfiles in your positions directory
 Number = length(files);%length(PartList);
 map = imread('map5.png'); 
 map = imresize(map,[500 450]);
@@ -11,17 +10,7 @@ lineLength = 50;
 for ii = 1:Number
     %Read in map and positions
     suj_num = files(ii).name(13:16);
-%----------Comment in if you are using PartList to only analyze
-%specific subjects---------------------------------------------
-%     disp(suj_num);
-%     if suj_num < 10
-%         file = strcat('positions_VP',num2str(0),num2str(suj_num),'.txt');
-%     else
-%         file = strcat('positions_VP',num2str(suj_num),'.txt');
-%     end
-%---------------------------------------------------------------
     data = fopen(files(ii).name);
-    %data = fopen(file);
     data = textscan(data,'%s','delimiter', '\n');
     data = data{1};
     data = table2array(cell2table(data));

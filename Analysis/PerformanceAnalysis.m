@@ -1,10 +1,12 @@
 %--Analyze Task Performance Overall and in Relation to Viewed Houses-------
-PartList ={3755,6876}; %all Subjects
-Number = length(PartList);
+dname = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\ViewedHouses\';%path to your viewed houses directory
 %--------------------------------------------------------------------------
+files = dir('AlignmentVR_SubjNo_*.mat');%Analyzes all subjectfiles in your Performance directory
+Number = length(files);
+Performances = cell(6,Number);%cell with overall performance for each task for each subject
 for ii = 1: Number
-    e = cell2mat(PartList(ii));
-    load(['AlignmentVR_SubjNo_',num2str(e),'.mat']);
+    suj_num = files(ii).name(20:23);
+    load(files(ii).name);
     Abs3sec = [];
     AbsInf = [];
     Rel3sec = [];
@@ -35,27 +37,32 @@ for ii = 1: Number
         IndexA3 = find([Absperf3s{:,1}]==(Output.Absolute.Trial_3s(i).House_Nr));
         Absperf3s(IndexA3,ii+1) = num2cell(Abs3sec(i));%performance for each house in absolute condition - 3Sec
     end
-
-    disp(['Subject ',num2str(e),':'])
-    disp(['Im Absolute Task 3sec korrekt: ' num2str(100*sum(Abs3sec)/36) '%']);
-    disp(['Im Absolute Task Inf korrekt: ' num2str(100*sum(AbsInf)/36) '%']);
-    disp(['Im Relative Task 3sec korrekt: ' num2str(100*sum(Rel3sec)/36) '%']);
-    disp(['Im Relative Task Inf korrekt: ' num2str(100*sum(RelInf)/36) '%']);
-    disp(['Im Pointing Task 3sec korrekt: ' num2str(100*sum(Poi3sec)/36) '%']);
-    disp(['Im Pointing Task Inf korrekt: ' num2str(100*sum(PoiInf)/36) '%']);
+    Performances(1:end,ii)=num2cell([(100*sum(Abs3sec)/36);(100*sum(AbsInf)/36);(100*sum(Rel3sec)/36);(100*sum(RelInf)/36);(100*sum(Poi3sec)/36);(100*sum(PoiInf)/36)]);
 end
+disp(['Im Absolute Task 3sec korrekt: ' num2str(mean([Performances{1,1:end}])) '%']);
+ disp(['Im Absolute Task Inf korrekt: ' num2str(mean([Performances{2,1:end}])) '%']);
+ disp(['Im Relative Task 3sec korrekt: ' num2str(mean([Performances{3,1:end}])) '%']);
+ disp(['Im Relative Task Inf korrekt: ' num2str(mean([Performances{4,1:end}])) '%']);
+ disp(['Im Pointing Task 3sec korrekt: ' num2str(mean([Performances{5,1:end}])) '%']);
+ disp(['Im Pointing Task Inf korrekt: ' num2str(mean([Performances{6,1:end}])) '%']);
 clear e;clear i; clear ii; clear IndexA3;clear IndexAI;clear houselistAInf;clear houselistA3;
 %% Analyze Task Performance in Relation to Viewed Houses
-dname = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\ViewedHouses\';
 listTCI = [];%list of viewing time for correct performance - Infinite
 listTWI = [];%list of viewing time for wrong performance - Infinite
 listTC3 = [];%list of viewing time for correct performance - 3sec
 listTW3 = [];%list of viewing time for wrong performance - 3sec
+numSubjects = 0;
 for ii = 1: Number
     %open numViewed Table
-    e = cell2mat(PartList(ii));
-    fname=fullfile(dname,['NumViewsD_VP_' num2str(e) '.mat']);
-    v = load(fname);
+    suj_num = files(ii).name(20:23);
+    fname=fullfile(dname,['NumViewsD_VP_' suj_num '.mat']);
+    try
+        v = load(fname);
+        numSubjects = numSubjects + 1;
+    catch
+        disp([suj_num ' does not have a NumViews file']);
+        continue
+    end
     numV=v.NumViews;
 
     for i = 1:36
@@ -114,7 +121,6 @@ ylabel('Variance in Viewing Distance')
 %% Analyze Task Performance in Relation to Viewed Distance and other stuff
 %not very clean with all the names but just change the lines with XX to the
 %variable you want to analyze.
-dname = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\ViewedHouses\';
 listTCI = [];%list of viewing time for correct performance - Infinite
 listTWI = [];%list of viewing time for wrong performance - Infinite
 listTC3 = [];%list of viewing time for correct performance - 3sec
