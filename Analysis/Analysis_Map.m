@@ -16,7 +16,7 @@ for ii = 1: Number
         map(int64(x.path(1,a)),int64(x.path(2,a)),1) = color(1);
         map(int64(x.path(1,a)),int64(x.path(2,a)),2) = color(2);
         map(int64(x.path(1,a)),int64(x.path(2,a)),3) = color(3);
-        num(int64(floor(x.path(1,a)/10)+1),int64(floor(x.path(2,a)/10)+1)) = 1;
+        num(51-int64(floor(x.path(1,a)/10)+1),int64(floor(x.path(2,a)/10)+1)) = 1;
         pos(int64(x.path(1,a)),int64(x.path(2,a))) = pos(int64(x.path(1,a)),int64(x.path(2,a)))+1;
     end
     numS=numS+num;
@@ -60,3 +60,37 @@ t = 90;%true north at 270 degrees -> -180 = 90
 [x,y] = pol2cart(t/180*pi,r);
 hold on;
 plot([0 x],[0,y])
+%% Draw walking path comparisons of repeated measures (color indicated time when place was visited)
+sjnums = readtable('C:\Users\vivia\Dropbox\Project Seahaven\Tracking\measurementList.txt');
+M1Num = [];
+M2Num = [];
+M3Num = [];
+for s=1:length(sjnums.Var1)
+    if ~isnan(sjnums.Var3(s))
+        M1Num = [M1Num sjnums.Var1(s)];
+        M2Num = [M2Num sjnums.Var2(s)];
+        M3Num = [M3Num sjnums.Var3(s)];
+    end
+end
+Measurements = [M1Num;M2Num;M3Num];
+
+Number = length(M1Num);
+for ii = 1: Number
+    num=zeros([51 46]);
+    disp(ii);
+    figure;
+    for iii=1:3
+        x.(strcat('x', num2str(iii))) = load(['path_VP_' num2str(Measurements(iii,ii)) '.mat']);
+        disp(num2str(Measurements(iii,ii)));
+        len = size(x.(strcat('x', num2str(iii))).path,2);
+        for a=1:len-1
+            num(51-int64(floor(x.(strcat('x', num2str(iii))).path(1,a)/10)+1),int64(floor(x.(strcat('x', num2str(iii))).path(2,a)/10)+1)) = a*100/len;
+        end
+        num(51-int64(floor(x.(strcat('x', num2str(iii))).path(1,1)/10)+1),int64(floor(x.(strcat('x', num2str(iii))).path(2,1)/10)+1)) = 200;
+        subplot(1,3,iii);hold on;
+        h=pcolor(num);
+        title(strcat('Measurement ',num2str(iii)));
+        set(h, 'EdgeColor', 'none');
+    end
+    colorbar;
+end

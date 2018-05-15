@@ -127,11 +127,15 @@ listTC3 = [];%list of viewing time for correct performance - 3sec
 listTW3 = [];%list of viewing time for wrong performance - 3sec
 for ii = 1: Number
     %open numViewed Table
-    e = cell2mat(PartList(ii));
-    fname=fullfile(dname,['NumViewsD_VP_' num2str(e) '.mat']);
-    v = load(fname);
-    numV=v.NumViews;
-
+    suj_num = files(ii).name(20:23);
+    fname=fullfile(dname,['NumViewsD_VP_' num2str(suj_num) '.mat']);
+    try
+        v = load(fname);
+        numV=v.NumViews;
+    catch
+        disp([suj_num ' does not have a NumViews file']);
+        continue
+    end
     for i = 1:36
         houseAI = AbsperfInf(i,1);
         if cell2mat(houseAI)<10%Format house number
