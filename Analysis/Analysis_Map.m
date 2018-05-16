@@ -38,7 +38,7 @@ set(h, 'EdgeColor', 'none');
 title('Total Number of Subjects in Each Area');
 %% show single maps (maybe don't do this when analyzing all subjects at once ;)
 % for ii = 1: Number
-%     e = cell2mat(PartList(ii));
+% e = files(ii).name(9:12);
 %     x = load(['map_VP_' num2str(e) '.mat']);
 %     figure;
 %     imshow(x.map);
@@ -87,10 +87,20 @@ for ii = 1: Number
             num(51-int64(floor(x.(strcat('x', num2str(iii))).path(1,a)/10)+1),int64(floor(x.(strcat('x', num2str(iii))).path(2,a)/10)+1)) = a*100/len;
         end
         num(51-int64(floor(x.(strcat('x', num2str(iii))).path(1,1)/10)+1),int64(floor(x.(strcat('x', num2str(iii))).path(2,1)/10)+1)) = 200;
-        subplot(1,3,iii);hold on;
+        subplot(1,4,iii);hold on;
         h=pcolor(num);
         title(strcat('Measurement ',num2str(iii)));
-        set(h, 'EdgeColor', 'none');
+        set(h, 'EdgeColor', 'none');axis off;
+        coverage.(['VP' num2str(ii)])(iii)=(nnz(num)/2346)*100;%Get percentage of map covered (nnz->num of non zero elements)
     end
+    subplot(1,4,4);axis off;
     colorbar;
 end
+figure;
+for ii = 1:Number
+    plot(coverage.(['VP' num2str(ii)]));
+    hold on;
+end
+title("Map Coverage in 3 Repeated Measurements in %");
+xlabel("Measurement Number");
+ylabel("% of Map coverage (not all places reachable");
