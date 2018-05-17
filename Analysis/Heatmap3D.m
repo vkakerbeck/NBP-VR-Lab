@@ -1,12 +1,12 @@
 %-------------3D Heatmap fo eye gaze (x,y,distance)------------------------
-PartList = {31};
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Heatmap3D/Results';
-Condition = 'RandomGaze';
+Condition = '';
 %--------------------------------------------------------------------------
-Number = length(PartList);
+files = dir('3DHeatmap_VP*.txt');%Analyzes all subjectfiles in your ViewedHouses directory
+Number = length(files);
 x=[];y=[];d=[];
 for num = 1:Number
-    VPNum =cell2mat(PartList(num));
+    VPNum =files(num).name(13:16);
     disp(VPNum);
     path = ['3DHeatmap' Condition '_VP' num2str(VPNum) '.txt'];
     disp(path);
@@ -16,7 +16,7 @@ for num = 1:Number
     data = table2array(cell2table(data));
     len = int64(length(data));
     for i = 1:double(len)
-        if data{i}(2)~=char('-')
+        if data{i}(2)~=char('-')&&~isempty(data{i}(21:end-1))&&~contains(data{i},'-')&&data{i}(10)==','
             x(end+1) = str2num(data{i}(2:9));
             y(end+1) = str2num(data{i}(11:19));
             d(end+1) = log(str2num(data{i}(21:end-1)));
@@ -43,11 +43,11 @@ t = array2table([x;y;d;c].');
 t.Properties.VariableNames = {'x' 'y' 'd' 'c'};
 toDelete = t.d < 0;
 t(toDelete,:) = [];
+save(fullfile(savepath,['Heatmap3D' Condition '_' num2str(Number) 'SJs']),'t');
 scatter3(d,x,y,2,c);%then save the plot by hand
 colorbar;
 xlabel('Close - Far','FontSize',22); ylabel('Left - Right','FontSize',22); zlabel('Up - Down','FontSize',22);
-save(fullfile(savepath,['Heatmap3D' Condition '_' VPNum]),'t');
-saveas(gcf,fullfile(savepath,['Heatmap3D' Condition '_' VPNum '.jpeg']));
+saveas(gcf,fullfile(savepath,['Heatmap3D' Condition '_' num2str(Number) 'SJs' '.jpeg']));
 %% Calculate difference & Other Extra Info
 %navigate into Results folder (where heatmaps from previous section are
 %saved)

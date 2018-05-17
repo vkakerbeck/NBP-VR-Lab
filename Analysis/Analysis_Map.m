@@ -91,7 +91,7 @@ for ii = 1: Number
         h=pcolor(num);
         title(strcat('Measurement ',num2str(iii)));
         set(h, 'EdgeColor', 'none');axis off;
-        coverage.(['VP' num2str(ii)])(iii)=(nnz(num)/2346)*100;%Get percentage of map covered (nnz->num of non zero elements)
+        coverage.(['VP' num2str(ii)])(iii)=(nnz(num)/1034)*100;%Get percentage of map covered (nnz->num of non zero elements in heatmap of all subjects)
     end
     subplot(1,4,4);axis off;
     colorbar;
@@ -101,6 +101,6 @@ for ii = 1:Number
     plot(coverage.(['VP' num2str(ii)]));
     hold on;
 end
-title("Map Coverage in 3 Repeated Measurements in %");
-xlabel("Measurement Number");
-ylabel("% of Map coverage (not all places reachable");
+title('Map Coverage in 3 Repeated Measurements in %');
+xlabel('Measurement Number');
+ylabel('% of Map coverage (all places visited by at least one subject)');
