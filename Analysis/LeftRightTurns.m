@@ -1,15 +1,16 @@
 %---------------Compare Gaze Before Left and Right Turns------------------- 
-PartList = {6876,3755};%List of subject numbers
 sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracking folder
 IntervalLength = 10;%Significant turn +_Interval Length = Interval of gazes counted for turn
 TurnSignificance = 20;%amount of rotation degree change for something to classified as turn
 %--------------------------------------------------------------------------
-Number = length(PartList);
+files = dir('EyesOnScreen_VP*.txt');%Analyzes all subjectfiles in your EyesOnScreen directory
+Number = length(files);
 rightpX = [];rightpY = [];
 leftpX = [];leftpY = [];
 normpX = [];normpY = [];
 for ii = 1:Number
-    suj_num = num2str(cell2mat(PartList(ii)));
+    suj_num = files(ii).name(16:19);
+    disp(suj_num);
     turnsright = [];
     turnsleft = [];
     rightI = [];
@@ -22,11 +23,15 @@ for ii = 1:Number
     X = zeros(1,len);
     Y = zeros(1,len);
     %cut out certain part
-    rdata = fopen(strcat(sourcepath,'Position\positions_VP',suj_num,'.txt'));
-    rdata = textscan(rdata,'%s','delimiter', '\n');
-    rdata = rdata{1};
-    rdata = table2array(cell2table(rdata));
-    rlen = int16(length(rdata)/9);
+    try
+        rdata = fopen(strcat(sourcepath,'Position\positions_VP',suj_num,'.txt'));
+        rdata = textscan(rdata,'%s','delimiter', '\n');
+        rdata = rdata{1};
+        rdata = table2array(cell2table(rdata));
+        rlen = int16(length(rdata)/9);
+    catch
+        continue
+    end
     r = zeros(1,rlen);
     %extract rotation information------------------------------------------
     for a = 1:double(len)-1
@@ -68,8 +73,14 @@ for ii = 1:Number
        X(a) = str2double(data{a}(2:9));
        Y(a) = str2double(data{a}(12:19));
     end
+    
     meanX = mean(X(X~=0));meanY = mean(Y(Y~=0));
-    X = X-meanX;Y = Y-meanY;
+    %X = X-meanX;Y = Y-meanY;
+    X = X-0.5;Y = Y-0.5;
+    X = X(abs(Y)<0.4);Y = Y(abs(Y)<0.4);
+    X = X(abs(X)<0.4);Y = Y(abs(X)<0.4);
+    len = int16(length(X));
+    
     for a = 50:len-100
        if(X(a)~=0 &&X(a-1)~=0 &&Y(a)~=0 &&Y(a-1)~=0 &&X(a)>-0.5&&Y(a)>-0.5&&X(a)<0.5&&Y(a)<0.5)%cut out false/uncertain recordings
            if ismember(a,rightI)
@@ -81,6 +92,7 @@ for ii = 1:Number
            end
        end
     end
+    fclose('all');
 end
 scatter(normpX,normpY);hold;scatter(rightpX,rightpY);scatter(leftpX,leftpY);
 [n,c] = hist3([normpX', normpY']);
@@ -94,7 +106,7 @@ plot(mean(leftpX),mean(leftpY),'k.','MarkerSize',35)
 plot(mean(leftpX),mean(leftpY),'y.','MarkerSize',30)
 plot(mean(normpX),mean(normpY),'k.','MarkerSize',35)
 plot(mean(normpX),mean(normpY),'b.','MarkerSize',30)
-saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['GazeLeftRight' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
+saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['GazeLeftRight' num2str(Number) 'SJs_' 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
 %% Make Heatmaps-----------------------------------------------------------
 size = 50;
 HMNorm = hist3([[normpX -0.3 0.3]', [normpY -0.3 0.3]'],[size,size]);
@@ -116,13 +128,13 @@ subplot(2,2,4);hold;
 title('Gaze During Left Turn');
 h3=pcolor(HMLeftN);colorbar;
 set(h3, 'EdgeColor', 'none');
-saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['HeatMapLeftRight' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
+saveas(gcf,fullfile(sourcepath,'EyesOnScreen\Results\',['HeatMapLeftRight' num2str(Number) 'SJs_' 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.jpeg']));
 %ttest the three distributions (left, right, normal)-----------------------
-% [hn pn] = ttest(normpX,0,'Alpha',0.01);
-% [hl pl] = ttest(leftpX,0,'Alpha',0.01);
-% [hr pr] = ttest(rightpX,0,'Alpha',0.01);
-% ttests = table([hn;pn],[hl;pl],[hr;pr]);
-% ttests.Properties.VariableNames = {'Normal','Left','Right'};
-% ttest.Properties.RowNames = {'Hypothesis Rejected','P-Value'};
-% save([sourcepath 'EyesOnScreen\Results\TTestLR' num2str(min([PartList{:}])) '-' num2str(max([PartList{:}])) 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.mat'],'ttests');
-%clear all;
+[hn pn] = ttest(normpX,0,'Alpha',0.01);
+[hl pl] = ttest(leftpX,0,'Alpha',0.01);
+[hr pr] = ttest(rightpX,0,'Alpha',0.01);
+ttests = table([hn;pn],[hl;pl],[hr;pr]);
+ttests.Properties.VariableNames = {'Normal','Left','Right'};
+ttest.Properties.RowNames = {'Hypothesis Rejected','P-Value'};
+save([sourcepath 'EyesOnScreen\Results\TTestLR' num2str(Number) 'SJs_' 'itv' num2str(IntervalLength) 'Tsig' num2str(TurnSignificance) '.mat'],'ttests');
+clear all;
