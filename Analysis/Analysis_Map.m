@@ -27,23 +27,24 @@ image(map)
 newp=zeros([51 46]);
 for x=1:500
     for y =1:450
-        newp(floor(x/10)+1,floor(y/10)+1) = newp(floor(x/10)+1,floor(y/10)+1)+pos(x,y);
+        newp(floor(x/10)+1,floor(y/10)+1) = newp(floor(x/10)+1,floor(y/10)+1)+pos(501-x,y);
     end
 end
 h=pcolor(newp/norm(newp));colorbar;
 set(h, 'EdgeColor', 'none');
+title('Total Number of Frames a Subject was in Each Area (normalized)');
 %% Heatmap with number of subjects visited
 h=pcolor(numS);colorbar;
 set(h, 'EdgeColor', 'none');
 title('Total Number of Subjects in Each Area');
-%% show single maps (maybe don't do this when analyzing all subjects at once ;)
-% for ii = 1: Number
-% e = files(ii).name(9:12);
-%     x = load(['map_VP_' num2str(e) '.mat']);
-%     figure;
-%     imshow(x.map);
-%     hold on;
-% end
+%% show single maps colored by rotation (maybe don't do this when analyzing all subjects at once ;)
+for ii = 1: 1
+e = files(ii).name(9:12);
+    x = load(['map_VP_' num2str(e) '.mat']);
+    figure;
+    imshow(x.map);
+    hold on;
+end
 %% Individual North
 %shows graph of individual north for all subjects
 % true north = rotation of 270
@@ -60,6 +61,7 @@ t = 90;%true north at 270 degrees -> -180 = 90
 [x,y] = pol2cart(t/180*pi,r);
 hold on;
 plot([0 x],[0,y])
+title('Direction of North for Each Subject (True North on Top)');
 %% Draw walking path comparisons of repeated measures (color indicated time when place was visited)
 sjnums = readtable('C:\Users\vivia\Dropbox\Project Seahaven\Tracking\measurementList.txt');
 M1Num = [];
@@ -75,26 +77,33 @@ end
 Measurements = [M1Num;M2Num;M3Num];
 
 Number = length(M1Num);
-for ii = 1: Number
-    num=zeros([51 46]);
+for ii = 1: 1
+    
     disp(ii);
     figure;
     for iii=1:3
+        num=zeros([51 46]);
         x.(strcat('x', num2str(iii))) = load(['path_VP_' num2str(Measurements(iii,ii)) '.mat']);
         disp(num2str(Measurements(iii,ii)));
         len = size(x.(strcat('x', num2str(iii))).path,2);
         for a=1:len-1
             num(51-int64(floor(x.(strcat('x', num2str(iii))).path(1,a)/10)+1),int64(floor(x.(strcat('x', num2str(iii))).path(2,a)/10)+1)) = a*100/len;
         end
-        num(51-int64(floor(x.(strcat('x', num2str(iii))).path(1,1)/10)+1),int64(floor(x.(strcat('x', num2str(iii))).path(2,1)/10)+1)) = 200;
-        subplot(1,4,iii);hold on;
+        sp = subplot(1,3,iii);hold on;
         h=pcolor(num);
-        title(strcat('Measurement ',num2str(iii)));
+        title(strcat('Measurement ',num2str(iii)), 'FontSize',20);
         set(h, 'EdgeColor', 'none');axis off;
+        p = get(sp, 'pos');
+        p(3) = p(3) + 0.065;
+        set(sp, 'pos', p);
+        hold on;plot(21.5,23.5,'.r');
         coverage.(['VP' num2str(ii)])(iii)=(nnz(num)/1034)*100;%Get percentage of map covered (nnz->num of non zero elements in heatmap of all subjects)
     end
-    subplot(1,4,4);axis off;
-    colorbar;
+%     sp = subplot(1,4,4);axis off;
+%     p = get(sp, 'pos');
+%     p(3) = p(3) + 0.05;
+%     set(sp, 'pos', p);
+    %colorbar;
 end
 figure;
 for ii = 1:Number
