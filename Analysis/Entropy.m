@@ -2,13 +2,39 @@
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/';
 IntervalLen = 2*30;%=2 seconds
 %--------------------------------------------------------------------------
-files = dir('ViewedHouses_VP*.txt');%Analyzes all subjectfiles in your ViewedHouses directory
+%%Load data
+Condition = "VR"; %Options: VR, VR-belt,All
+Repeated = false;%Options: true, false
+%--------------------------------------------------------------------------
+files = [];
+if Condition ~= "All"
+    for line = 1:height(Seahavenalingmentproject)
+        if lower(cellstr(Seahavenalingmentproject.Training(line)))==lower(Condition) && Seahavenalingmentproject.Discarded(line) ==""
+            if Repeated == false && Seahavenalingmentproject.Measurement(line)==1
+                files = [files, Seahavenalingmentproject.Subject(line)];
+            end
+            if Repeated == true && Seahavenalingmentproject.Measurement(line)==3
+                str = char(Seahavenalingmentproject.Comments(line));
+                i = strfind(Seahavenalingmentproject.Comments(line),'#');
+                Mes = [str2num(str(i(1)+1:i(1)+4));str2num(str(i(2)+1:i(2)+4));(Seahavenalingmentproject.Subject(line))];
+                files = [files, Mes];
+            end
+        end
+    end
+else
+    files = dir('ViewedHouses_VP*.txt');%Analyzes all subjectfiles in your ViewedHouses directory
+end
+% Analyze -----------------------------------------------------------------
 Number = length(files);
 avgdist = cell(1,Number);
 avgEs = cell(2,Number+1);
 avgEAll = 0;
 for ii = 1:Number
-    suj_num = files(ii).name(16:19);
+    if Condition == "All"
+        suj_num = files(ii).name(16:19);
+    else
+        suj_num = files(ii);
+    end
     disp(suj_num);
     file = strcat('ViewedHouses/ViewedHouses_VP',num2str(suj_num),'.txt');
     data = fopen(file);
@@ -47,7 +73,7 @@ for ii = 1:Number
 end
 avgEs{1,end} = 'all';
 avgEs{2,end} = avgEAll/Number;
-save(fullfile(savepath,['Results\Entropy_' num2str(IntervalLen) '_' num2str(Number) 'SJs.mat']), 'avgEs');
+save(fullfile(savepath,['TaskPerformance\Results\Entropy_' num2str(IntervalLen) '_' num2str(Number) 'SJs.mat']), 'avgEs');
 hist([avgEs{2,:}])
 %clear all;
 %% Now we can look if people with higher entropy (more switches between houses) have better performance...

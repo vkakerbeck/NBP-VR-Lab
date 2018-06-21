@@ -1,12 +1,38 @@
 %--Analyze Task Performance Overall and in Relation to Viewed Houses-------
 dname = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\ViewedHouses\';%path to your viewed houses directory
 %--------------------------------------------------------------------------
-files = dir('AlignmentVR_SubjNo_*.mat');%Analyzes all subjectfiles in your Performance directory
+%%Load data
+Condition = "VR"; %Options: VR, VR-belt,All
+Repeated = false;%Options: true, false
+%--------------------------------------------------------------------------
+files = [];
+if Condition ~= "All"
+    for line = 1:height(Seahavenalingmentproject)
+        if lower(cellstr(Seahavenalingmentproject.Training(line)))==lower(Condition) && Seahavenalingmentproject.Discarded(line) ==""
+            if Repeated == false && Seahavenalingmentproject.Measurement(line)==1
+                files = [files, Seahavenalingmentproject.Subject(line)];
+            end
+            if Repeated == true && Seahavenalingmentproject.Measurement(line)==3
+                str = char(Seahavenalingmentproject.Comments(line));
+                i = strfind(Seahavenalingmentproject.Comments(line),'#');
+                Mes = [str2num(str(i(1)+1:i(1)+4));str2num(str(i(2)+1:i(2)+4));(Seahavenalingmentproject.Subject(line))];
+                files = [files, Mes];
+            end
+        end
+    end
+else
+    files = dir('AlignmentVR_SubjNo_*.mat');%Analyzes all subjectfiles in your Performance directory
+end
+%Analyze ------------------------------------------------------------------
 Number = length(files);
 Performances = cell(6,Number);%cell with overall performance for each task for each subject
 for ii = 1: Number
-    suj_num = files(ii).name(20:23);
-    load(files(ii).name);
+    if Condition == "All"
+        suj_num = files(ii).name(20:23);
+    else
+        suj_num = files(ii);
+    end
+    load(['AlignmentVR_SubjNo_',num2str(suj_num), '.mat']);
     Abs3sec = [];
     AbsInf = [];
     Rel3sec = [];
@@ -127,7 +153,11 @@ listTC3 = [];%list of viewing time for correct performance - 3sec
 listTW3 = [];%list of viewing time for wrong performance - 3sec
 for ii = 1: Number
     %open numViewed Table
-    suj_num = files(ii).name(20:23);
+    if Condition == "All"
+        suj_num = files(ii).name(20:23);
+    else
+        suj_num = files(ii);
+    end
     fname=fullfile(dname,['NumViewsD_VP_' num2str(suj_num) '.mat']);
     try
         v = load(fname);

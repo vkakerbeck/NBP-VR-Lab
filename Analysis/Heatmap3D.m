@@ -2,11 +2,37 @@
 savepath = 'C:/Users/vivia/Dropbox/Project Seahaven/Tracking/Heatmap3D/Results';
 Condition = '';
 %--------------------------------------------------------------------------
-files = dir('3DHeatmap_VP*.txt');%Analyzes all subjectfiles in your ViewedHouses directory
+%%Load data
+Cond = "VR"; %Options: VR, VR-belt,All
+Repeated = false;%Options: true, false
+%--------------------------------------------------------------------------
+files = [];
+if Cond ~= "All"
+    for line = 1:height(Seahavenalingmentproject)
+        if lower(cellstr(Seahavenalingmentproject.Training(line)))==lower(Cond) && Seahavenalingmentproject.Discarded(line) ==""
+            if Repeated == false && Seahavenalingmentproject.Measurement(line)==1
+                files = [files, Seahavenalingmentproject.Subject(line)];
+            end
+            if Repeated == true && Seahavenalingmentproject.Measurement(line)==3
+                str = char(Seahavenalingmentproject.Comments(line));
+                i = strfind(Seahavenalingmentproject.Comments(line),'#');
+                Mes = [str2num(str(i(1)+1:i(1)+4));str2num(str(i(2)+1:i(2)+4));(Seahavenalingmentproject.Subject(line))];
+                files = [files, Mes];
+            end
+        end
+    end
+else
+    files = dir('3DHeatmap_VP*.txt');%Analyzes all subjectfiles in your ViewedHouses directory
+end
+%Analyze ------------------------------------------------------------------
 Number = length(files);
 x=[];y=[];d=[];
-for num = 1:Number
-    VPNum =files(num).name(13:16);
+for num = 1:1
+    if Cond == "All"
+        VPNum =files(num).name(13:16);
+    else
+        VPNum = files(num);
+    end
     disp(VPNum);
     path = ['3DHeatmap' Condition '_VP' num2str(VPNum) '.txt'];
     disp(path);
@@ -25,11 +51,12 @@ for num = 1:Number
         end
         %sort out point of no tracking
         if d(i)>=200 || d(i)<=0 || x(i)>1 ||y(i) >1 ||x(i)==0||y(i)==0
-            x(i)=200;y(i)=200;d(i)=200;
+            x(i)=200;y(i)=200;d(i)=200; 
         end
     end
     d = d(d~=200);y = y(y~=200);x = x(x~=200);
 end
+%% 
 c=zeros(size(x));
 for i=1:length(x)
   j=1:length(x);
@@ -45,7 +72,7 @@ toDelete = t.d < 0;
 t(toDelete,:) = [];
 save(fullfile(savepath,['Heatmap3D' Condition '_' num2str(Number) 'SJs']),'t');
 scatter3(d,x,y,2,c);%then save the plot by hand
-colorbar;
+colorbar;   
 xlabel('Close - Far','FontSize',22); ylabel('Left - Right','FontSize',22); zlabel('Up - Down','FontSize',22);
 saveas(gcf,fullfile(savepath,['Heatmap3D' Condition '_' num2str(Number) 'SJs' '.jpeg']));
 %% Calculate difference & Other Extra Info

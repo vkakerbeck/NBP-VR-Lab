@@ -3,13 +3,39 @@ sourcepath = 'C:\Users\vivia\Dropbox\Project Seahaven\Tracking\';%path to tracki
 IntervalLength = 10;%Significant turn +_Interval Length = Interval of gazes counted for turn
 TurnSignificance = 20;%amount of rotation degree change for something to classified as turn
 %--------------------------------------------------------------------------
-files = dir('EyesOnScreen_VP*.txt');%Analyzes all subjectfiles in your EyesOnScreen directory
+%%Load data
+Condition = "VR"; %Options: VR, VR-belt,All
+Repeated = false;%Options: true, false
+%--------------------------------------------------------------------------
+files = [];
+if Condition ~= "All"
+    for line = 1:height(Seahavenalingmentproject)
+        if lower(cellstr(Seahavenalingmentproject.Training(line)))==lower(Condition) && Seahavenalingmentproject.Discarded(line) ==""
+            if Repeated == false && Seahavenalingmentproject.Measurement(line)==1
+                files = [files, Seahavenalingmentproject.Subject(line)];
+            end
+            if Repeated == true && Seahavenalingmentproject.Measurement(line)==3
+                str = char(Seahavenalingmentproject.Comments(line));
+                i = strfind(Seahavenalingmentproject.Comments(line),'#');
+                Mes = [str2num(str(i(1)+1:i(1)+4));str2num(str(i(2)+1:i(2)+4));(Seahavenalingmentproject.Subject(line))];
+                files = [files, Mes];
+            end
+        end
+    end
+else
+    files = dir('EyesOnScreen_VP*.txt');%Analyzes all subjectfiles in your ViewedHouses directory
+end
+%Analyze ------------------------------------------------------------------
 Number = length(files);
 rightpX = [];rightpY = [];
 leftpX = [];leftpY = [];
 normpX = [];normpY = [];
 for ii = 1:Number
-    suj_num = files(ii).name(16:19);
+    if Condition == "All"
+        suj_num = files(ii).name(16:19);
+    else
+        suj_num = files(ii);
+    end
     disp(suj_num);
     turnsright = [];
     turnsleft = [];
