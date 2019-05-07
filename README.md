@@ -5,6 +5,9 @@ This Git project is designated to the purpose of sharing files and code related 
 ## Short Demo
 https://www.youtube.com/watch?v=F2rqn8bdE7A&t=6s
 
+## Publication
+Clay, V., König, P., & König, S. (2019). Eye tracking in virtual reality. Journal of Eye Movement Research, 12(1). https://doi.org/10.16910/jemr.12.1.3
+
 
 ## Getting Started
 
