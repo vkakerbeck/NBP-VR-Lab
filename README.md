@@ -37,7 +37,7 @@ Please be careful when changing other peoples code, maybe talk to them first. Co
 
 ## Authors
 
-* **Viviane Kakerbeck** - Research assistant at the University of Osnabrück; vkakerbeck@uos.de; vkakerbeck.tk
+* **Viviane Clay** - PhD student at the University of Osnabrück; vkakerbeck@uos.de; vkakerbeck.tk
 * **Raul Sulaimanov** - Master Student at the University of Osnabrück
 * add yourself to the list if you contribute to this project
 
